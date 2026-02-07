@@ -1,70 +1,138 @@
-# Getting Started with Create React App
+# Dominic Amuah - Professional Portfolio
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Full-stack developer portfolio built with React, showcasing projects, experience, and skills.
+
+## 🚀 Tech Stack
+
+- **React** 19.2.4
+- **Tailwind CSS** 4.1.18
+- **EmailJS** for contact form
+- **Create React App**
+
+## 📦 Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+# Add your EmailJS credentials to .env
+
+# Start development server
+npm start
+```
 
 ## Available Scripts
-
-In the project directory, you can run:
 
 ### `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
 ### `npm run build`
 
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `npm test`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Launches the test runner in the interactive watch mode.
 
-### `npm run eject`
+## 🌐 Deployment to Vercel
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 1. Prepare Your Project
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Before deployment, ensure you have:
+- All images uploaded to `/public/` folder
+- Your resume PDF in `/public/documents/`
+- Certificates in `/public/certificates/`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 2. Deploy to Vercel
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### Option A: Vercel CLI
+```bash
+# Install Vercel CLI
+npm install -g vercel
 
-## Learn More
+# Deploy
+vercel
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Deploy to production
+vercel --prod
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Option B: Vercel Dashboard
+1. Go to [vercel.com](https://vercel.com)
+2. Click "Add New Project"
+3. Import your GitHub repository
+4. Add environment variables in project settings:
+   - `REACT_APP_EMAILJS_SERVICE_ID`
+   - `REACT_APP_EMAILJS_TEMPLATE_ID`
+   - `REACT_APP_EMAILJS_PUBLIC_KEY`
+5. Click "Deploy"
 
-### Code Splitting
+### 3. Add Environment Variables on Vercel
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Go to your project settings → Environment Variables and add:
 
-### Analyzing the Bundle Size
+```
+REACT_APP_EMAILJS_SERVICE_ID = service_r1skdtn
+REACT_APP_EMAILJS_TEMPLATE_ID = template_28eybuh
+REACT_APP_EMAILJS_PUBLIC_KEY = DdMIsqYEDB8ssBKB-
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📁 Project Structure
 
-### Making a Progressive Web App
+```
+my-portfolio/
+├── public/
+│   ├── certificates/          # Certificate images (JPG)
+│   ├── documents/            # Resume PDF
+│   ├── my-photo.jpg          # Profile photo
+│   ├── project1-4.jpg        # Project screenshots
+│   └── github-icon.svg       # GitHub icon
+├── src/
+│   ├── components/           # React components
+│   └── index.css             # Tailwind + custom styles
+└── vercel.json               # Vercel configuration
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 📝 Required Files Before Deployment
 
-### Advanced Configuration
+Upload these files to `/public/`:
+- `my-photo.jpg` - Your profile photo
+- `project1.jpg` - Reflect Blog screenshot
+- `project2.jpg` - Domemily Fashion screenshot
+- `project3.jpg` - InnerPieces screenshot
+- `project4.jpg` - StudyHub screenshot
+- `certificates/professional-foundations-certificate.jpg`
+- `certificates/backend-web-development-certificate.jpg`
+- `certificates/cybersecurity-certificate.jpg`
+- `documents/Dominic-Amuah-Resume.pdf`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## ✨ Features
 
-### Deployment
+- 📱 Fully responsive design
+- 🎨 Modern dark theme with accent colors
+- 📧 Working contact form with EmailJS
+- 🔗 Social media integration
+- 📄 Downloadable resume and certificates
+- ⬆️ Smooth scrolling and back-to-top button
+- 🔍 SEO optimized with meta tags
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 📧 Contact Form Setup
 
-### `npm run build` fails to minify
+The contact form uses EmailJS. Your credentials are already configured in `.env`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 👤 Author
+
+**Dominic Amuah**
+- Email: dominicquainoo62@gmail.com
+- LinkedIn: [dominic-amuah-bb116428b](https://www.linkedin.com/in/dominic-amuah-bb116428b/)
+- GitHub: [Dominic62q](https://github.com/Dominic62q)
+- Location: Accra, Ghana
+
+---
+
+Built with ❤️ using React and Tailwind CSS
