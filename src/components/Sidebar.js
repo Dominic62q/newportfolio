@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
+const menuItems = ['Home', 'About', 'Projects', 'Experience', 'Certificates', 'Contact'];
+
 const Sidebar = () => {
-  const menuItems = ['Home', 'About', 'Projects', 'Experience', 'Certificates', 'Contact'];
   const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
