@@ -27,7 +27,7 @@ const Projects = () => {
       image: '/project3.jpg',
       technologies: ['Python', 'Django',],
       github: 'https://github.com/Dominic62q/InnerPieces',
-      demo: 'https://project3-demo.com'
+      demo: 'https://innerpieces-9813729bc1de.herokuapp.com/'
     },
     {
       id: 4,
