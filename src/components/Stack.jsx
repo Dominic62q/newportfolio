@@ -3,17 +3,20 @@ import { stackGroups } from '../data/stack'
 
 export default function Stack() {
   return (
-    <section id="stack" className="py-24 border-t border-[#e5e5e3] dark:border-[#2a2a2a]">
+    <section id="stack" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.5 }}
-          className="mb-12"
+          className="mb-14"
         >
-          <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest mb-4">Stack</p>
-          <h2 className="text-3xl md:text-4xl font-semibold text-[#111] dark:text-[#f0f0ee] leading-tight tracking-tight">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-xs font-mono text-[#f97316]">03</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Stack</span>
+          </div>
+          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
             Tools I work with.
           </h2>
         </motion.div>
@@ -28,14 +31,14 @@ export default function Stack() {
               transition={{ duration: 0.4, delay: i * 0.06 }}
               className="flex flex-col sm:flex-row sm:items-start gap-4"
             >
-              <div className="sm:w-32 shrink-0">
-                <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest pt-1">{category}</p>
+              <div className="sm:w-28 shrink-0 pt-0.5">
+                <p className="text-[10px] font-mono text-[#f97316] uppercase tracking-widest">{category}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {items.map((item) => (
                   <span
                     key={item}
-                    className="text-sm px-3 py-1.5 border border-[#e5e5e3] dark:border-[#2a2a2a] text-[#444] dark:text-[#bbb] rounded-lg bg-white dark:bg-[#1a1a1a] hover:border-[#ccc] dark:hover:border-[#444] transition-colors"
+                    className="text-sm px-3 py-1.5 border border-[#e8e8e6] dark:border-[#1e1e1e] text-[#555] dark:text-[#999] rounded-lg bg-white dark:bg-[#0f0f0f] hover:border-[#f97316]/40 hover:text-[#f97316] dark:hover:border-[#f97316]/30 dark:hover:text-[#f97316] transition-all cursor-default"
                   >
                     {item}
                   </span>

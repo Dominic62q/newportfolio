@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -7,22 +7,27 @@ const fadeUp = {
 
 export default function About() {
   return (
-    <section id="about" className="py-24 border-t border-[#e5e5e3] dark:border-[#2a2a2a]">
-      <div className="max-w-3xl mx-auto px-6">
+    <section id="about" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
+      <div className="max-w-4xl mx-auto px-6">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
           variants={fadeUp}
         >
-          <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest mb-4">About</p>
+          {/* Section label */}
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-xs font-mono text-[#f97316]">01</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">About</span>
+          </div>
 
-          <h2 className="text-3xl md:text-4xl font-semibold text-[#111] dark:text-[#f0f0ee] leading-tight tracking-tight mb-8">
-            Building backend systems<br className="hidden md:block" /> that actually work.
+          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight mb-10">
+            Building backend systems<br className="hidden md:block" />
+            <span className="text-[#f97316]"> that actually work.</span>
           </h2>
 
           <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-4 text-[#444] dark:text-[#bbb] text-base leading-relaxed">
+            <div className="space-y-4 text-[#555] dark:text-[#999] text-base leading-relaxed">
               <p>
                 I'm a backend-focused developer based in Accra, Ghana. I build
                 web applications and REST APIs using Python, Django, and Django
@@ -40,25 +45,25 @@ export default function About() {
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-7">
               <div>
-                <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest mb-3">Education</p>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555] mb-3">Education</p>
                 <div>
-                  <p className="text-sm font-medium text-[#111] dark:text-[#f0f0ee]">BSc Biological Sciences</p>
-                  <p className="text-sm text-[#888] dark:text-[#666]">University of Ghana &middot; 2021 – 2024</p>
+                  <p className="text-sm font-semibold text-[#111] dark:text-[#f0f0ee]">BSc Biological Sciences</p>
+                  <p className="text-sm text-[#999] dark:text-[#666]">University of Ghana · 2021 — 2024</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest mb-3">Certifications</p>
-                <ul className="space-y-1.5">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555] mb-3">Certifications</p>
+                <ul className="space-y-2">
                   {[
                     'ALX Professional Foundations',
                     'ALX Software Engineering — Python Backend',
                     'ALX Cybersecurity Program',
                   ].map((cert) => (
-                    <li key={cert} className="text-sm text-[#555] dark:text-[#aaa] flex items-start gap-2">
-                      <span className="text-[#bbb] dark:text-[#444] mt-0.5">—</span>
+                    <li key={cert} className="text-sm text-[#666] dark:text-[#aaa] flex items-start gap-2">
+                      <span className="text-[#f97316] mt-0.5 shrink-0">—</span>
                       {cert}
                     </li>
                   ))}
@@ -66,7 +71,7 @@ export default function About() {
               </div>
 
               <div>
-                <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest mb-3">Languages</p>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555] mb-3">Languages</p>
                 <div className="flex flex-wrap gap-3">
                   {[
                     { lang: 'English', level: 'Expert' },
@@ -74,7 +79,7 @@ export default function About() {
                     { lang: 'French', level: 'Intermediate' },
                   ].map(({ lang, level }) => (
                     <span key={lang} className="text-sm text-[#555] dark:text-[#aaa]">
-                      {lang} <span className="text-[#aaa] dark:text-[#555]">({level})</span>
+                      {lang} <span className="text-[#bbb] dark:text-[#555] text-xs">({level})</span>
                     </span>
                   ))}
                 </div>

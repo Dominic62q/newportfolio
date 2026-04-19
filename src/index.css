@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
@@ -13,17 +14,51 @@
     background-color: #f9f9f7;
     color: #111111;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   html.dark body {
-    background-color: #0f0f0d;
+    background-color: #0a0a0a;
     color: #f0f0ee;
   }
 
   ::selection {
-    background-color: #dbeafe;
-    color: #1e3a8a;
+    background-color: #f97316;
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d1d1cf;
+    border-radius: 99px;
+  }
+
+  html.dark ::-webkit-scrollbar-thumb {
+    background-color: #2a2a2a;
   }
 }
- 
+
+@layer components {
+  .font-display {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0) }
+  to   { transform: translateX(-33.333%) }
+}
+

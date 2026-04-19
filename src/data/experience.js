@@ -5,10 +5,10 @@ export const experiences = [
     company: 'Rigelis Inc.',
     period: 'Sep 2024 – Present',
     bullets: [
-      'Support and maintain pharmaceutical web systems and internal software workflows.',
-      'Troubleshoot backend, API, database, and UI issues across operational systems.',
-      'Assist with system testing, technical demonstrations, and end-user support.',
-      'Improve software reliability and day-to-day system usability.',
+      'Contribute to MedsGH — a live pharmacy inventory and delivery platform built with Nuxt 3, Vue, and Firebase.',
+      'Build and maintain features including SMS OTP campaigns, multi-tenant admin dashboards, and sales analytics.',
+      'Troubleshoot backend, API, Firebase, and UI issues across the platform in a collaborative team.',
+      'Support system testing, technical demonstrations, and end-user onboarding.',
     ],
   },
   {

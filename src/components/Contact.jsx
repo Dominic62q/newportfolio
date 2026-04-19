@@ -45,7 +45,7 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-24 border-t border-[#e5e5e3] dark:border-[#2a2a2a]">
+    <section id="contact" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -54,22 +54,25 @@ export default function Contact() {
           transition={{ duration: 0.5 }}
           className="mb-12"
         >
-          <p className="text-xs text-[#aaa] dark:text-[#555] uppercase tracking-widest mb-4">Contact</p>
-          <h2 className="text-3xl md:text-4xl font-semibold text-[#111] dark:text-[#f0f0ee] leading-tight tracking-tight">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-xs font-mono text-[#f97316]">06</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Contact</span>
+          </div>
+          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
             Let's work together.
           </h2>
-          <p className="mt-3 text-[#666] dark:text-[#999] text-base max-w-md">
+          <p className="mt-4 text-[#777] dark:text-[#888] text-base max-w-md">
             Open to backend, full-stack, and API-focused roles. Feel free to reach out.
           </p>
 
-          <div className="flex flex-wrap gap-5 mt-6">
+          <div className="flex flex-wrap gap-5 mt-7">
             {links.map(({ label, href }) => (
               <a
                 key={label}
                 href={href}
                 target={href.startsWith('mailto') ? undefined : '_blank'}
                 rel="noopener noreferrer"
-                className="text-sm text-[#888] dark:text-[#666] hover:text-[#111] dark:hover:text-[#f0f0ee] transition-colors"
+                className="text-sm text-[#999] dark:text-[#666] hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
               >
                 {label} ↗
               </a>
@@ -86,7 +89,7 @@ export default function Contact() {
           className="space-y-5 max-w-lg"
         >
           <div>
-            <label htmlFor="name" className="block text-xs text-[#aaa] uppercase tracking-widest mb-1.5">
+            <label htmlFor="name" className="block text-[10px] text-[#aaa] dark:text-[#555] uppercase tracking-[0.15em] mb-2">
               Name
             </label>
             <input
@@ -97,12 +100,12 @@ export default function Contact() {
               value={form.name}
               onChange={handleChange}
               placeholder="Your name"
-              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] rounded-lg bg-white text-[#111] placeholder-[#ccc] focus:outline-none focus:border-[#999] transition-colors"
+              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-xl bg-white dark:bg-[#111] text-[#111] dark:text-[#f0f0ee] placeholder-[#ccc] dark:placeholder-[#333] focus:outline-none focus:border-[#f97316] dark:focus:border-[#f97316] transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-xs text-[#aaa] uppercase tracking-widest mb-1.5">
+            <label htmlFor="email" className="block text-[10px] text-[#aaa] dark:text-[#555] uppercase tracking-[0.15em] mb-2">
               Email
             </label>
             <input
@@ -113,12 +116,12 @@ export default function Contact() {
               value={form.email}
               onChange={handleChange}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] rounded-lg bg-white text-[#111] placeholder-[#ccc] focus:outline-none focus:border-[#999] transition-colors"
+              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-xl bg-white dark:bg-[#111] text-[#111] dark:text-[#f0f0ee] placeholder-[#ccc] dark:placeholder-[#333] focus:outline-none focus:border-[#f97316] dark:focus:border-[#f97316] transition-colors"
             />
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-xs text-[#aaa] uppercase tracking-widest mb-1.5">
+            <label htmlFor="message" className="block text-[10px] text-[#aaa] dark:text-[#555] uppercase tracking-[0.15em] mb-2">
               Message
             </label>
             <textarea
@@ -129,12 +132,12 @@ export default function Contact() {
               value={form.message}
               onChange={handleChange}
               placeholder="What are you working on?"
-              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] rounded-lg bg-white text-[#111] placeholder-[#ccc] focus:outline-none focus:border-[#999] transition-colors resize-none"
+              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-xl bg-white dark:bg-[#111] text-[#111] dark:text-[#f0f0ee] placeholder-[#ccc] dark:placeholder-[#333] focus:outline-none focus:border-[#f97316] dark:focus:border-[#f97316] transition-colors resize-none"
             />
           </div>
 
           {status.message && (
-            <p className={`text-sm ${status.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+            <p className={`text-sm ${status.type === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
               {status.message}
             </p>
           )}
@@ -142,9 +145,14 @@ export default function Contact() {
           <button
             type="submit"
             disabled={sending}
-            className="px-6 py-3 bg-[#111] dark:bg-[#f0f0ee] text-[#f9f9f7] dark:text-[#111] text-sm font-medium rounded-full hover:bg-[#333] dark:hover:bg-[#ddd] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#f97316] hover:bg-[#ea6c00] text-white text-sm font-medium rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {sending ? 'Sending…' : 'Send Message'}
+            {!sending && (
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            )}
           </button>
         </motion.form>
       </div>

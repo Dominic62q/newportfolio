@@ -5,15 +5,15 @@ export const stackGroups = [
   },
   {
     category: 'Frontend',
-    items: ['React', 'JavaScript', 'HTML', 'CSS', 'Tailwind CSS'],
+    items: ['React', 'Vue', 'Nuxt 3', 'JavaScript', 'HTML', 'CSS', 'Tailwind CSS'],
   },
   {
     category: 'Database',
-    items: ['PostgreSQL', 'MySQL', 'SQLite'],
+    items: ['PostgreSQL', 'SQLite', 'Firebase / Firestore'],
   },
   {
     category: 'Tools',
-    items: ['Git', 'GitHub', 'Postman', 'VS Code', 'Linux / Bash'],
+    items: ['Git', 'GitHub', 'Postman', 'VS Code', 'Linux / Bash', 'Docker', 'Cloudinary'],
   },
   {
     category: 'Deployment',
