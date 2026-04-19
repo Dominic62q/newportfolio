@@ -17,9 +17,16 @@ function ProjectCard({ project, index }) {
 
       <div className="border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-2xl p-6 bg-white dark:bg-[#111] hover:border-[#f97316]/40 dark:hover:border-[#f97316]/30 hover:shadow-lg hover:shadow-[#f97316]/5 transition-all duration-300">
         <div className="flex items-start justify-between gap-4 mb-3">
-          <h3 className="text-base font-semibold text-[#111] dark:text-[#f0f0ee] leading-snug group-hover:text-[#f97316] transition-colors">
-            {project.title}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[#111] dark:text-[#f0f0ee] leading-snug group-hover:text-[#f97316] transition-colors">
+              {project.title}
+            </h3>
+            {project.contributor && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-[#f97316]/10 text-[#f97316]/70 border border-[#f97316]/20 shrink-0">
+                contributor
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-3 shrink-0">
             {project.github && (
               <a

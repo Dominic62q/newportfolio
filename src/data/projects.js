@@ -72,6 +72,7 @@ export const projects = [
     ],
     github: 'https://github.com/Ciraq-Inc/ajv',
     demo: 'https://medsgh.com',
+    contributor: true,
   },
   {
     id: 6,
@@ -87,5 +88,6 @@ export const projects = [
     ],
     github: 'https://github.com/capeku/navigatr',
     demo: 'https://navigatr-chi.vercel.app/',
+    contributor: true,
   },
 ]
