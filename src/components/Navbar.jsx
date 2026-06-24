@@ -1,4 +1,6 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { Sun, Moon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useTheme } from '../context/ThemeContext'
 
 const navLinks = [
@@ -12,22 +14,19 @@ const navLinks = [
 function ThemeToggle() {
   const { isDark, toggle } = useTheme()
   return (
-    <button
+    <Button
       onClick={toggle}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#eee] dark:hover:bg-[#222] transition-colors text-[#777] dark:text-[#888] hover:text-[#111] dark:hover:text-[#f0f0ee]"
+      variant="ghost"
+      size="icon-sm"
+      className="rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
     >
       {isDark ? (
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-        </svg>
+        <Sun className="size-4" />
       ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
+        <Moon className="size-4" />
       )}
-    </button>
+    </Button>
   )
 }
 
@@ -62,6 +61,11 @@ export default function Navbar() {
   const handleNav = (e, href) => {
     e.preventDefault()
     setMenuOpen(false)
+    if (href === '#') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      setActive('')
+      return
+    }
     const el = document.querySelector(href)
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -70,7 +74,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#f9f9f7]/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md border-b border-[#e5e5e3] dark:border-[#1e1e1e]'
+          ? 'border-b border-border bg-background/90 backdrop-blur-md'
           : 'bg-transparent'
       }`}
     >
@@ -78,12 +82,11 @@ export default function Navbar() {
         <a
           href="#"
           onClick={(e) => handleNav(e, '#')}
-          className="text-sm font-semibold text-[#111] dark:text-[#f0f0ee] tracking-tight hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
+          className="text-sm font-semibold text-foreground tracking-tight hover:text-brand transition-colors"
         >
           Dominic Amuah
         </a>
 
-        {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-6">
           {navLinks.map(({ label, href }) => {
             const id = href.replace('#', '')
@@ -95,57 +98,53 @@ export default function Navbar() {
                   onClick={(e) => handleNav(e, href)}
                   className={`text-sm transition-colors relative ${
                     isActive
-                      ? 'text-[#f97316]'
-                      : 'text-[#666] dark:text-[#888] hover:text-[#111] dark:hover:text-[#f0f0ee]'
+                      ? 'text-brand'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {label}
                   {isActive && (
-                    <span className="absolute -bottom-0.5 left-0 right-0 h-px bg-[#f97316] rounded-full" />
+                    <span className="absolute -bottom-0.5 left-0 right-0 h-px bg-brand rounded-full" />
                   )}
                 </a>
               </li>
             )
           })}
           <li>
-            <a
-              href="/documents/Dominic-Amuah-Resume.pdf"
-              download="Dominic-Amuah-Resume.pdf"
-              className="text-sm px-4 py-1.5 border border-[#ddd] dark:border-[#333] text-[#111] dark:text-[#f0f0ee] rounded-full hover:border-[#f97316] hover:text-[#f97316] dark:hover:border-[#f97316] dark:hover:text-[#f97316] transition-all"
-            >
-              Resume
-            </a>
+            <Button asChild variant="outline" size="sm" className="rounded-full border-border bg-transparent px-4 text-foreground hover:border-brand hover:text-brand">
+              <a href="/documents/Dominic-Amuah-Resume.pdf" download="Dominic-Amuah-Resume.pdf">
+                Resume
+              </a>
+            </Button>
           </li>
           <li>
             <ThemeToggle />
           </li>
         </ul>
 
-        {/* Mobile right */}
         <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
           <button
-            className="flex flex-col gap-1.5 p-1"
+            className="flex flex-col gap-1.5 rounded-full p-1"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
-            <span className={`block h-0.5 w-6 bg-[#111] dark:bg-[#f0f0ee] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block h-0.5 w-6 bg-[#111] dark:bg-[#f0f0ee] transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block h-0.5 w-6 bg-[#111] dark:bg-[#f0f0ee] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            <span className={`block h-0.5 w-6 bg-foreground transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block h-0.5 w-6 bg-foreground transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-0.5 w-6 bg-foreground transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#f9f9f7] dark:bg-[#0a0a0a] border-b border-[#e5e5e3] dark:border-[#1e1e1e] px-6 pb-5 pt-2">
+        <div className="md:hidden border-b border-border bg-background px-6 pb-5 pt-2">
           <ul className="flex flex-col gap-4">
             {navLinks.map(({ label, href }) => (
               <li key={label}>
                 <a
                   href={href}
                   onClick={(e) => handleNav(e, href)}
-                  className="text-sm text-[#555] dark:text-[#aaa] hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
+                  className="text-sm text-muted-foreground hover:text-brand transition-colors"
                 >
                   {label}
                 </a>
@@ -155,7 +154,7 @@ export default function Navbar() {
               <a
                 href="/documents/Dominic-Amuah-Resume.pdf"
                 download="Dominic-Amuah-Resume.pdf"
-                className="text-sm text-[#111] dark:text-[#f0f0ee] font-medium hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
+                className="text-sm text-foreground font-medium hover:text-brand transition-colors"
               >
                 Resume ↓
               </a>

@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { experiences } from '../data/experience'
 
 export default function Experience() {
   return (
-    <section id="experience" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
+    <section id="experience" className="py-28 border-t border-border">
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -13,15 +15,15 @@ export default function Experience() {
           className="mb-14"
         >
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono text-[#f97316]">04</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Experience</span>
+            <span className="text-xs font-mono text-brand">04</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Experience</span>
           </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
+          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
             Where I've worked.
           </h2>
         </motion.div>
 
-        <div className="space-y-10">
+        <div className="space-y-6">
           {experiences.map((exp, i) => (
             <motion.div
               key={exp.id}
@@ -29,29 +31,39 @@ export default function Experience() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.45, delay: i * 0.08 }}
-              className="flex flex-col md:flex-row gap-4 md:gap-12"
             >
-              <div className="md:w-40 shrink-0">
-                <p className="text-xs font-mono text-[#999] dark:text-[#555] mt-0.5 leading-snug">{exp.period}</p>
-              </div>
+              <Card className="border-border bg-card shadow-none">
+                <CardContent className="px-(--card-spacing) py-5">
+                  <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <div className="mb-2 flex items-start gap-3">
+                        <div className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                        <div>
+                          <h3 className="text-base font-semibold leading-snug text-foreground">
+                            {exp.role}
+                          </h3>
+                          <p className="mt-1 text-sm text-muted-foreground">{exp.company}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="w-fit rounded-full border-border bg-card px-3 py-1 text-xs font-mono text-muted-foreground"
+                    >
+                      {exp.period}
+                    </Badge>
+                  </div>
 
-              <div className="flex-1">
-                <div className="flex items-start gap-3 mb-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#f97316] mt-2 shrink-0" />
-                  <h3 className="text-base font-semibold text-[#111] dark:text-[#f0f0ee] leading-snug">
-                    {exp.role}
-                  </h3>
-                </div>
-                <p className="text-sm text-[#999] dark:text-[#666] mb-4 ml-[18px]">{exp.company}</p>
-                <ul className="space-y-2 ml-[18px]">
-                  {exp.bullets.map((b, idx) => (
-                    <li key={idx} className="text-sm text-[#666] dark:text-[#999] flex items-start gap-2 leading-relaxed">
-                      <span className="text-[#f97316]/40 shrink-0 mt-0.5">—</span>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                  <ul className="space-y-2">
+                    {exp.bullets.map((b, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+                        <span className="mt-0.5 shrink-0 text-brand/40">→</span>
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>

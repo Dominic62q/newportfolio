@@ -1,4 +1,7 @@
-﻿import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { projects } from '../data/projects'
 
 function ProjectCard({ project, index }) {
@@ -10,78 +13,76 @@ function ProjectCard({ project, index }) {
       transition={{ duration: 0.55, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
       className="group relative"
     >
-      {/* Numbered index */}
-      <span className="absolute -top-3 -left-1 font-mono text-[10px] text-[#f97316]/40 group-hover:text-[#f97316] transition-colors">
+      <span className="absolute -top-3 -left-1 font-mono text-[10px] text-brand/40 group-hover:text-brand transition-colors">
         {String(index + 1).padStart(2, '0')}
       </span>
 
-      <div className="border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-2xl p-6 bg-white dark:bg-[#111] hover:border-[#f97316]/40 dark:hover:border-[#f97316]/30 hover:shadow-lg hover:shadow-[#f97316]/5 transition-all duration-300">
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold text-[#111] dark:text-[#f0f0ee] leading-snug group-hover:text-[#f97316] transition-colors">
-              {project.title}
-            </h3>
-            {project.contributor && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-[#f97316]/10 text-[#f97316]/70 border border-[#f97316]/20 shrink-0">
-                contributor
-              </span>
-            )}
+      <Card className="border-border bg-card shadow-none transition-all duration-300 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/5">
+        <CardHeader className="gap-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base leading-snug text-foreground transition-colors group-hover:text-brand">
+                {project.title}
+              </CardTitle>
+              {project.contributor && (
+                <Badge variant="outline" className="shrink-0 border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
+                  contributor
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              {project.github && (
+                <Button asChild variant="link" size="sm" className="h-auto px-0 text-xs text-muted-foreground/60 hover:text-brand">
+                  <a href={project.github} target="_blank" rel="noopener noreferrer">
+                    GitHub ↗
+                  </a>
+                </Button>
+              )}
+              {project.demo && (
+                <Button asChild variant="link" size="sm" className="h-auto px-0 text-xs text-muted-foreground/60 hover:text-brand">
+                  <a href={project.demo} target="_blank" rel="noopener noreferrer">
+                    Live ↗
+                  </a>
+                </Button>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-[#ccc] dark:text-[#444] hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
+        </CardHeader>
+
+        <CardContent>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+            {project.summary}
+          </p>
+
+          <ul className="space-y-1.5 mb-5">
+            {project.features.slice(0, 3).map((f) => (
+              <li key={f} className="text-xs text-muted-foreground flex items-start gap-2">
+                <span className="text-brand/40 mt-0.5 shrink-0">→</span>
+                {f}
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex flex-wrap gap-1.5">
+            {project.stack.map((tech) => (
+              <Badge
+                key={tech}
+                variant="outline"
+                className="rounded-full border-border bg-muted px-2.5 py-0.5 text-[11px] font-normal text-muted-foreground"
               >
-                GitHub ↗
-              </a>
-            )}
-            {project.demo && (
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-[#ccc] dark:text-[#444] hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
-              >
-                Live ↗
-              </a>
-            )}
+                {tech}
+              </Badge>
+            ))}
           </div>
-        </div>
-
-        <p className="text-sm text-[#777] dark:text-[#888] leading-relaxed mb-5">
-          {project.summary}
-        </p>
-
-        <ul className="space-y-1.5 mb-5">
-          {project.features.slice(0, 3).map((f) => (
-            <li key={f} className="text-xs text-[#999] dark:text-[#666] flex items-start gap-2">
-              <span className="text-[#f97316]/40 mt-0.5 shrink-0">→</span>
-              {f}
-            </li>
-          ))}
-        </ul>
-
-        <div className="flex flex-wrap gap-1.5">
-          {project.stack.map((tech) => (
-            <span
-              key={tech}
-              className="text-[11px] px-2.5 py-0.5 bg-[#f4f4f2] dark:bg-[#1a1a1a] text-[#888] dark:text-[#666] rounded-full border border-[#e8e8e6] dark:border-[#252525]"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </motion.div>
   )
 }
 
 export default function Projects() {
   return (
-    <section id="projects" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
+    <section id="projects" className="py-28 border-t border-border">
       <div className="max-w-4xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -92,10 +93,10 @@ export default function Projects() {
         >
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-xs font-mono text-[#f97316]">02</span>
-              <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Projects</span>
+              <span className="text-xs font-mono text-brand">02</span>
+              <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Projects</span>
             </div>
-            <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
+            <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
               Things I've built.
             </h2>
           </div>
@@ -103,7 +104,7 @@ export default function Projects() {
             href="https://github.com/Dominic62q"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 text-sm text-[#aaa] dark:text-[#555] hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors shrink-0"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm text-muted-foreground/60 hover:text-brand transition-colors shrink-0"
           >
             All on GitHub ↗
           </a>

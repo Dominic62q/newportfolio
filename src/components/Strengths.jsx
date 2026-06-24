@@ -1,41 +1,42 @@
 import { motion } from 'framer-motion'
+import { Card, CardContent } from '@/components/ui/card'
 
 const strengths = [
   {
     title: 'Backend Systems',
     description:
-      'Design and build robust backend architectures with Django and DRF — authentication, permissions, APIs, and database logic.',
+      'Design and improve robust backend systems with Django, DRF, and Node.js across authentication, permissions, APIs, and business logic.',
   },
   {
     title: 'REST API Design',
     description:
-      'Build clean, documented REST APIs that frontend clients can rely on — serializers, viewsets, filtering, and pagination.',
+      'Build practical REST APIs that frontend clients and internal tools can rely on, with clear structure, filtering, and maintainable integration points.',
   },
   {
     title: 'Database Design',
     description:
-      'Model data well from the start — relational schemas, query optimisation, and migration-safe design with PostgreSQL.',
+      'Model relational data carefully from the start with PostgreSQL, MySQL, and SQLite, including query debugging and workflow-aware schema decisions.',
   },
   {
     title: 'Frontend Integration',
     description:
-      'Connect backend logic to usable frontend interfaces using React — comfortable on both sides of the stack.',
+      'Connect backend logic to usable interfaces with React, Nuxt, and Django templates while keeping frontend-backend workflows clean.',
   },
   {
-    title: 'Debugging & Problem Solving',
+    title: 'Secure Product Thinking',
     description:
-      'Diagnose and fix issues in running systems — from API errors to database bottlenecks to frontend rendering bugs.',
+      'Apply cybersecurity awareness to access control, authentication flows, input handling, privacy, and safer operational user experiences.',
   },
   {
-    title: 'Shipping',
+    title: 'Debugging & Delivery',
     description:
-      'Deploy to production on Render, Vercel, and Heroku — environment config, build pipelines, and live troubleshooting.',
+      'Diagnose API, database, UI, deployment, and workflow issues, then document fixes, support testing, and help teams ship reliably.',
   },
 ]
 
 export default function Strengths() {
   return (
-    <section id="strengths" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
+    <section id="strengths" className="py-28 border-t border-border">
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -45,15 +46,15 @@ export default function Strengths() {
           className="mb-14"
         >
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono text-[#f97316]">05</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Capabilities</span>
+            <span className="text-xs font-mono text-brand">05</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Capabilities</span>
           </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
+          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
             What I do well.
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid gap-5 md:grid-cols-2">
           {strengths.map((s, i) => (
             <motion.div
               key={s.title}
@@ -61,11 +62,20 @@ export default function Strengths() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
-            className="group relative pl-5 border-l-2 border-[#e8e8e6] dark:border-[#1e1e1e] hover:border-[#f97316] dark:hover:border-[#f97316] transition-colors duration-300"
-          >
-            <span className="absolute -left-[7px] top-1 w-3 h-3 rounded-full border-2 border-[#e8e8e6] dark:border-[#1e1e1e] group-hover:border-[#f97316] group-hover:bg-[#f97316] bg-[#f9f9f7] dark:bg-[#0a0a0a] transition-all duration-300" />
-            <h3 className="text-sm font-semibold text-[#111] dark:text-[#f0f0ee] mb-1.5 group-hover:text-[#f97316] transition-colors">{s.title}</h3>
-            <p className="text-sm text-[#777] dark:text-[#888] leading-relaxed">{s.description}</p>
+            >
+              <Card className="group h-full border-border bg-card shadow-none transition-colors hover:border-brand/40">
+                <CardContent className="px-(--card-spacing) py-5">
+                  <div className="mb-3 flex items-start gap-3">
+                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full border border-border bg-card transition-colors group-hover:border-brand group-hover:bg-brand" />
+                    <h3 className="text-sm font-semibold text-foreground transition-colors group-hover:text-brand">
+                      {s.title}
+                    </h3>
+                  </div>
+                  <p className="pl-[22px] text-sm leading-relaxed text-muted-foreground">
+                    {s.description}
+                  </p>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>

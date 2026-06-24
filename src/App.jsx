@@ -24,7 +24,7 @@ function ScrollProgress() {
   }, [])
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-[2px] pointer-events-none">
-      <div className="h-full bg-[#f97316]" style={{ width: `${pct}%`, transition: 'width 0.05s linear' }} />
+      <div className="h-full bg-brand" style={{ width: `${pct}%`, transition: 'width 0.05s linear' }} />
     </div>
   )
 }
@@ -33,9 +33,9 @@ function App() {
   return (
     <ThemeProvider>
       <ScrollProgress />
-      <div className="min-h-screen bg-[#f9f9f7] dark:bg-[#0a0a0a] text-[#111] dark:text-[#f0f0ee]">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
-        <main>
+        <main id="main-content">
           <Hero />
           <Marquee />
           <About />
