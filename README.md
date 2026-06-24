@@ -1,16 +1,61 @@
-# React + Vite
+# Dominic Amuah Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Personal portfolio for Dominic Amuah, built with React, Vite, Tailwind CSS v4, Framer Motion, and `shadcn/ui`.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- Vite 8
+- Tailwind CSS 4
+- Framer Motion
+- `shadcn/ui`
+- EmailJS for the contact form
 
-## React Compiler
+## Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+From the `portfolio/` directory:
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Verify the production build with:
+
+```bash
+npm run build
+```
+
+## Environment Variables
+
+The contact form requires EmailJS credentials.
+
+Create a local `.env` file in `portfolio/` using `.env.example` as a reference:
+
+```bash
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+If these values are missing, the contact form UI will still render but sending messages will fail.
+
+## Main Content Areas
+
+- Hero and developer positioning
+- About
+- Projects
+- Stack
+- Experience
+- Capabilities
+- Contact
+
+## Deployment
+
+This app is configured as a standard Vite static site and can be deployed to platforms like Vercel.
+
+Before deploying:
+
+1. Set the `VITE_EMAILJS_*` environment variables in the hosting platform.
+2. Confirm the resume file exists at `public/documents/Dominic-Amuah-Resume.pdf`.
+3. Run `npm run build` locally to verify the production bundle.

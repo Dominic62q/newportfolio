@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { stackGroups } from '../data/stack'
 
 export default function Stack() {
   return (
-    <section id="stack" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
+    <section id="stack" className="py-28 border-t border-border">
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -13,15 +15,15 @@ export default function Stack() {
           className="mb-14"
         >
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono text-[#f97316]">03</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Stack</span>
+            <span className="text-xs font-mono text-brand">03</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Stack</span>
           </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
+          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
             Tools I work with.
           </h2>
         </motion.div>
 
-        <div className="space-y-8">
+        <div className="space-y-5">
           {stackGroups.map(({ category, items }, i) => (
             <motion.div
               key={category}
@@ -29,21 +31,25 @@ export default function Stack() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
-              className="flex flex-col sm:flex-row sm:items-start gap-4"
             >
-              <div className="sm:w-28 shrink-0 pt-0.5">
-                <p className="text-[10px] font-mono text-[#f97316] uppercase tracking-widest">{category}</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {items.map((item) => (
-                  <span
-                    key={item}
-                    className="text-sm px-3 py-1.5 border border-[#e8e8e6] dark:border-[#1e1e1e] text-[#555] dark:text-[#999] rounded-lg bg-white dark:bg-[#0f0f0f] hover:border-[#f97316]/40 hover:text-[#f97316] dark:hover:border-[#f97316]/30 dark:hover:text-[#f97316] transition-all cursor-default"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
+              <Card className="border-border bg-card shadow-none">
+                <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-start px-(--card-spacing) py-4">
+                  <div className="sm:w-28 shrink-0 pt-0.5">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-brand">{category}</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {items.map((item) => (
+                      <Badge
+                        key={item}
+                        variant="outline"
+                        className="cursor-default rounded-lg border-border bg-card px-3 py-1.5 text-sm font-normal text-muted-foreground transition-all hover:border-brand/40 hover:text-brand"
+                      >
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           ))}
         </div>

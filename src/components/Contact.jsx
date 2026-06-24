@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 import emailjs from '@emailjs/browser'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 
 const links = [
   { label: 'GitHub', href: 'https://github.com/Dominic62q' },
@@ -45,7 +50,7 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="py-28 border-t border-[#e5e5e3] dark:border-[#1e1e1e]">
+    <section id="contact" className="py-28 border-t border-border">
       <div className="max-w-3xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -55,13 +60,13 @@ export default function Contact() {
           className="mb-12"
         >
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono text-[#f97316]">06</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-[#aaa] dark:text-[#555]">Contact</span>
+            <span className="text-xs font-mono text-brand">06</span>
+            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Contact</span>
           </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-[#111] dark:text-[#f0f0ee] leading-[1.05] tracking-tight">
+          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
             Let's work together.
           </h2>
-          <p className="mt-4 text-[#777] dark:text-[#888] text-base max-w-md">
+          <p className="mt-4 text-muted-foreground text-base max-w-md">
             Open to backend, full-stack, and API-focused roles. Feel free to reach out.
           </p>
 
@@ -72,7 +77,7 @@ export default function Contact() {
                 href={href}
                 target={href.startsWith('mailto') ? undefined : '_blank'}
                 rel="noopener noreferrer"
-                className="text-sm text-[#999] dark:text-[#666] hover:text-[#f97316] dark:hover:text-[#f97316] transition-colors"
+                className="text-sm text-muted-foreground hover:text-brand transition-colors"
               >
                 {label} ↗
               </a>
@@ -86,74 +91,77 @@ export default function Contact() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.5, delay: 0.1 }}
           onSubmit={handleSubmit}
-          className="space-y-5 max-w-lg"
+          className="max-w-lg"
         >
-          <div>
-            <label htmlFor="name" className="block text-[10px] text-[#aaa] dark:text-[#555] uppercase tracking-[0.15em] mb-2">
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Your name"
-              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-xl bg-white dark:bg-[#111] text-[#111] dark:text-[#f0f0ee] placeholder-[#ccc] dark:placeholder-[#333] focus:outline-none focus:border-[#f97316] dark:focus:border-[#f97316] transition-colors"
-            />
-          </div>
+          <Card className="border-border bg-card shadow-none">
+            <CardContent className="space-y-5 px-(--card-spacing) py-5">
+              <div>
+                <label htmlFor="name" className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60">
+                  Name
+                </label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Your name"
+                  className="h-12 rounded-xl border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:border-brand focus-visible:ring-brand/20"
+                />
+              </div>
 
-          <div>
-            <label htmlFor="email" className="block text-[10px] text-[#aaa] dark:text-[#555] uppercase tracking-[0.15em] mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              placeholder="your@email.com"
-              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-xl bg-white dark:bg-[#111] text-[#111] dark:text-[#f0f0ee] placeholder-[#ccc] dark:placeholder-[#333] focus:outline-none focus:border-[#f97316] dark:focus:border-[#f97316] transition-colors"
-            />
-          </div>
+              <div>
+                <label htmlFor="email" className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="your@email.com"
+                  className="h-12 rounded-xl border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:border-brand focus-visible:ring-brand/20"
+                />
+              </div>
 
-          <div>
-            <label htmlFor="message" className="block text-[10px] text-[#aaa] dark:text-[#555] uppercase tracking-[0.15em] mb-2">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              required
-              rows={5}
-              value={form.message}
-              onChange={handleChange}
-              placeholder="What are you working on?"
-              className="w-full px-4 py-3 text-sm border border-[#e5e5e3] dark:border-[#1e1e1e] rounded-xl bg-white dark:bg-[#111] text-[#111] dark:text-[#f0f0ee] placeholder-[#ccc] dark:placeholder-[#333] focus:outline-none focus:border-[#f97316] dark:focus:border-[#f97316] transition-colors resize-none"
-            />
-          </div>
+              <div>
+                <label htmlFor="message" className="mb-2 block text-[10px] uppercase tracking-[0.15em] text-muted-foreground/60">
+                  Message
+                </label>
+                <Textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows={5}
+                  value={form.message}
+                  onChange={handleChange}
+                  placeholder="What are you working on?"
+                  className="min-h-36 rounded-xl border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:border-brand focus-visible:ring-brand/20"
+                />
+              </div>
 
-          {status.message && (
-            <p className={`text-sm ${status.type === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
-              {status.message}
-            </p>
-          )}
+              {status.message && (
+                <p className={`text-sm ${status.type === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
+                  {status.message}
+                </p>
+              )}
 
-          <button
-            type="submit"
-            disabled={sending}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#f97316] hover:bg-[#ea6c00] text-white text-sm font-medium rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {sending ? 'Sending…' : 'Send Message'}
-            {!sending && (
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            )}
-          </button>
+              <Button
+                type="submit"
+                disabled={sending}
+                size="lg"
+                className="rounded-full bg-brand px-6 text-brand-foreground hover:brightness-90"
+              >
+                {sending ? 'Sending...' : 'Send Message'}
+                {!sending && (
+                  <ArrowUpRight className="size-2.5" />
+                )}
+              </Button>
+            </CardContent>
+          </Card>
         </motion.form>
       </div>
     </section>
