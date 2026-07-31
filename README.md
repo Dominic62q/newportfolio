@@ -40,6 +40,25 @@ VITE_EMAILJS_PUBLIC_KEY=your_public_key
 
 If these values are missing, the contact form UI will still render but sending messages will fail.
 
+### Spotify Now Playing
+
+The portfolio includes an optional Now Playing widget backed by Spotify's `GET /me/player/currently-playing` endpoint. Spotify authorization requires the `user-read-currently-playing` scope.
+
+Add these server-only values to `.env` locally and to Vercel project environment variables:
+
+```bash
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+SPOTIFY_REFRESH_TOKEN=your_spotify_refresh_token
+SPOTIFY_REDIRECT_URI=http://127.0.0.1:5173/callback
+```
+
+Never prefix these variables with `VITE_`: the client secret and refresh token must not be bundled into the browser. The widget stays hidden when Spotify is not configured, when playback is paused, or when Spotify is temporarily unavailable.
+
+Spotify recommends Authorization Code with PKCE for single-page apps; because this portfolio uses a secure server endpoint for a single owner's playback, the server-side Authorization Code flow is suitable for storing the refresh token securely.
+
+To create the refresh token locally, start the app and open `http://127.0.0.1:5173/api/spotify-auth`. Approve the requested Spotify permission, copy the refresh token shown on the local callback page into `.env`, and restart Vite. Do not commit `.env` or share the refresh token.
+
 ## Main Content Areas
 
 - Hero and developer positioning

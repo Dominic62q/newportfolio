@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import NowPlaying from './NowPlaying'
 
 export default function Hero() {
   return (
@@ -12,8 +13,10 @@ export default function Hero() {
         DA.
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
-        <motion.div
+      <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center lg:gap-12">
+          <div>
+            <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -24,9 +27,9 @@ export default function Hero() {
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand" />
           </span>
           Available for work - Accra, Ghana
-        </motion.div>
+            </motion.div>
 
-        <motion.h1
+            <motion.h1
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -36,9 +39,9 @@ export default function Hero() {
           Dominic
           <br />
           Amuah<span className="text-brand">.</span>
-        </motion.h1>
+            </motion.h1>
 
-        <motion.div
+            <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
@@ -51,9 +54,9 @@ export default function Hero() {
             <span className="text-foreground font-semibold">Django</span>,{' '}
             <span className="text-foreground font-semibold">Node.js</span>, and modern frontend tools.
           </p>
-        </motion.div>
+            </motion.div>
 
-        <motion.div
+            <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
@@ -87,7 +90,11 @@ export default function Hero() {
               Resume ↓
             </a>
           </Button>
-        </motion.div>
+            </motion.div>
+          </div>
+
+          <NowPlaying />
+        </div>
 
         <motion.div
           initial={{ opacity: 0 }}
