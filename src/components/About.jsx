@@ -29,22 +29,20 @@ export default function About() {
           <div className="grid md:grid-cols-2 gap-12">
             <div className="space-y-4 text-muted-foreground text-base leading-relaxed">
               <p>
-                I'm a software developer based in Accra, Ghana with a backend
-                focus. I build web applications, REST APIs, and internal
-                software tools using Python, Django, Django REST Framework,
-                Node.js, and React.
+                I'm a Software Developer at Rigelis Inc. based in Accra, Ghana,
+                building backend-focused full-stack products, internal tools,
+                and healthcare and operations systems.
               </p>
               <p>
-                I focus on backend logic, authentication, permissions, database
-                design, debugging, and clean integration between systems. I
-                also bring a cybersecurity background that shapes how I think
-                about access control, privacy, and safer user workflows.
+                My work spans Django and Django REST Framework, Node.js, React,
+                PostgreSQL, authentication, RBAC, API integration, debugging,
+                and deployment support. A cybersecurity background shapes how I
+                think about access control, data privacy, and reliability.
               </p>
               <p>
-                Currently working across software development and systems
-                support at Rigelis Inc., contributing to healthcare and
-                operations software while actively seeking backend or full-stack
-                development roles.
+                Recent work includes hospital inventory and ordering workflows,
+                AssetTrack Pro, open-source mapping tooling, and MarianSave, an
+                offline-first desktop finance tracker.
               </p>
             </div>
 
@@ -52,7 +50,7 @@ export default function About() {
               <div>
                 <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60 mb-3">Education</p>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">BSc Biological Sciences</p>
+                  <p className="text-sm font-semibold text-foreground">BSc Biological Sciences (Biochemistry &amp; Plant Biology)</p>
                   <p className="text-sm text-muted-foreground">University of Ghana · 2021 - 2024</p>
                 </div>
               </div>

@@ -49,8 +49,8 @@ export default function Hero() {
         >
           <div className="w-[2px] h-14 bg-brand/40 shrink-0 mt-1 rounded-full" />
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-            Software developer building practical web applications, REST APIs,
-            and internal tools with{' '}
+            Software Developer at Rigelis Inc. building backend-focused full-stack
+            products, internal tools, and healthcare and operations systems with{' '}
             <span className="text-foreground font-semibold">Django</span>,{' '}
             <span className="text-foreground font-semibold">Node.js</span>, and modern frontend tools.
           </p>
