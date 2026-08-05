@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ExternalLink, Headphones, Music2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -23,9 +23,53 @@ function PanelShell({ children, className = '' }) {
   )
 }
 
+function formatTime(ms) {
+  if (ms === null || ms === undefined || Number.isNaN(ms)) return '--:--'
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, '0')}`
+}
+
+/** A spinning vinyl record — album art sits in the label, grooves ring the edge. */
+function VinylDisc({ imageUrl, spinning, icon = null }) {
+  return (
+    <div className="relative shrink-0">
+      <motion.div
+        animate={spinning ? { rotate: 360 } : { rotate: 0 }}
+        transition={spinning ? { duration: 7, repeat: Infinity, ease: 'linear' } : { duration: 0.4 }}
+        className="relative size-16 rounded-full md:size-24"
+        style={{
+          background:
+            'repeating-radial-gradient(circle at center, #171717 0px, #171717 2px, #2b2b2b 3px, #2b2b2b 4.5px)',
+          boxShadow: '0 10px 30px -12px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.06)',
+        }}
+      >
+        <div className="absolute inset-[13%] overflow-hidden rounded-full ring-[3px] ring-black/70">
+          {imageUrl ? (
+            <img src={imageUrl} alt="" className="size-full object-cover" />
+          ) : (
+            <div className="flex size-full items-center justify-center bg-neutral-800 text-brand">
+              {icon}
+            </div>
+          )}
+        </div>
+        <div className="absolute inset-0 m-auto size-2 rounded-full bg-[#0a0a0a] ring-1 ring-white/10 md:size-2.5" />
+      </motion.div>
+      {spinning ? (
+        <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-brand shadow-[0_0_0_3px_var(--color-card)] md:size-5">
+          <span className="size-1.5 rounded-full bg-brand-foreground" />
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
 export default function NowPlaying() {
   const [track, setTrack] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [elapsedMs, setElapsedMs] = useState(0)
+  const tickRef = useRef(null)
 
   const loadTrack = useCallback(async () => {
     try {
@@ -42,7 +86,9 @@ export default function NowPlaying() {
       if (!response.ok) throw new Error('Spotify request failed')
 
       const payload = await response.json()
-      setTrack(payload.isPlaying ? payload.track : null)
+      const nextTrack = payload.isPlaying ? payload.track : null
+      setTrack(nextTrack)
+      setElapsedMs(nextTrack?.progressMs ?? 0)
     } catch {
       setTrack(null)
     } finally {
@@ -56,6 +102,22 @@ export default function NowPlaying() {
     return () => window.clearInterval(interval)
   }, [loadTrack])
 
+  // Ticks the progress bar forward between polls so it reads as genuinely "live".
+  useEffect(() => {
+    window.clearInterval(tickRef.current)
+    if (!track?.durationMs) return undefined
+
+    tickRef.current = window.setInterval(() => {
+      setElapsedMs((current) => Math.min(track.durationMs, current + 1000))
+    }, 1000)
+
+    return () => window.clearInterval(tickRef.current)
+  }, [track])
+
+  const progressPercent = track?.durationMs
+    ? Math.min(100, (elapsedMs / track.durationMs) * 100)
+    : 0
+
   if (loading) {
     return (
       <PanelShell>
@@ -68,7 +130,7 @@ export default function NowPlaying() {
             <span className="size-2 animate-pulse rounded-full bg-muted" />
           </div>
           <div className="mt-4 flex items-center gap-3 md:mt-6 md:gap-4">
-            <div className="size-14 shrink-0 animate-pulse rounded-xl bg-muted md:size-24 md:rounded-2xl" />
+            <div className="size-16 shrink-0 animate-pulse rounded-full bg-muted md:size-24" />
             <div className="min-w-0 flex-1 space-y-3">
               <div className="h-4 w-4/5 animate-pulse rounded bg-muted" />
               <div className="h-3 w-3/5 animate-pulse rounded bg-muted" />
@@ -96,18 +158,16 @@ export default function NowPlaying() {
           </div>
 
           <div className="relative mt-4 flex items-center gap-3 md:mt-7 md:gap-4">
-            <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-dashed border-brand/40 bg-brand/[0.06] text-brand md:size-24 md:rounded-2xl">
-              <Headphones className="size-6 md:size-9" strokeWidth={1.4} aria-hidden="true" />
-            </div>
+            <VinylDisc spinning={false} icon={<Headphones className="size-6 md:size-9" strokeWidth={1.4} aria-hidden="true" />} />
             <div>
-              <p className="font-display text-base font-bold tracking-tight text-foreground md:text-xl">Nothing playing</p>
+              <p className="font-display text-base font-bold tracking-tight text-foreground md:text-xl">The needle&apos;s resting</p>
               <p className="mt-1 max-w-[13rem] text-xs leading-relaxed text-muted-foreground md:text-sm">
-                Check back when Dominic starts a new track.
+                Check back when Dominic drops the next track.
               </p>
             </div>
           </div>
 
-          <div className="relative mt-4 flex items-center gap-2 border-t border-border pt-3 text-[10px] text-muted-foreground md:mt-6 md:pt-4 md:text-xs">
+          <div className="relative mt-4 flex items-center gap-2 border-t border-dashed border-border pt-3 text-[10px] text-muted-foreground md:mt-6 md:pt-4 md:text-xs">
             <Music2 className="size-3 text-brand md:size-3.5" aria-hidden="true" />
             Live from Spotify
           </div>
@@ -141,17 +201,11 @@ export default function NowPlaying() {
         </div>
 
         <div className="relative mt-4 flex items-center gap-3 md:mt-7 md:gap-4">
-          {track.imageUrl ? (
-            <img
-              src={track.imageUrl}
-              alt=""
-              className="size-14 shrink-0 rounded-xl object-cover shadow-lg shadow-black/10 md:size-24 md:rounded-2xl"
-            />
-          ) : (
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-muted text-brand md:size-24 md:rounded-2xl">
-              <Music2 className="size-6 md:size-9" aria-hidden="true" />
-            </span>
-          )}
+          <VinylDisc
+            imageUrl={track.imageUrl}
+            spinning
+            icon={<Music2 className="size-6 md:size-9" aria-hidden="true" />}
+          />
           <span className="min-w-0 text-left">
             <span className="block text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground md:text-[10px] md:tracking-[0.16em]">Currently listening to</span>
             <span className="mt-1.5 block truncate font-display text-base font-bold tracking-tight text-foreground md:mt-2 md:text-xl">{track.name}</span>
@@ -159,7 +213,23 @@ export default function NowPlaying() {
           </span>
         </div>
 
-        <span className="relative mt-4 flex items-center justify-between border-t border-border pt-3 text-[10px] font-medium text-muted-foreground transition-colors group-hover:text-foreground md:mt-6 md:pt-4 md:text-xs">
+        {track.durationMs ? (
+          <div className="relative mt-4 md:mt-6">
+            <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
+              <motion.div
+                className="h-full rounded-full bg-brand"
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ duration: 0.6, ease: 'linear' }}
+              />
+            </div>
+            <div className="mt-1.5 flex items-center justify-between text-[9px] font-medium tabular-nums text-muted-foreground md:text-[10px]">
+              <span>{formatTime(elapsedMs)}</span>
+              <span>{formatTime(track.durationMs)}</span>
+            </div>
+          </div>
+        ) : null}
+
+        <span className="relative mt-4 flex items-center justify-between border-t border-dashed border-border pt-3 text-[10px] font-medium text-muted-foreground transition-colors group-hover:text-foreground md:mt-5 md:pt-4 md:text-xs">
           <span className="md:hidden">Open in Spotify</span>
           <span className="hidden md:inline">Open this track on Spotify</span>
           <ExternalLink className="size-3 text-brand md:size-3.5" aria-hidden="true" />
