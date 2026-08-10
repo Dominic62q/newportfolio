@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Monitor } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -63,6 +64,16 @@ function ProjectCard({ project, index }) {
           <p className="text-sm text-muted-foreground leading-relaxed mb-5">
             {project.summary}
           </p>
+
+          {project.desktopOnly && (
+            <div className="mb-5 flex items-start gap-2 rounded-xl border border-brand/20 bg-brand/5 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+              <Monitor className="mt-0.5 size-3.5 shrink-0 text-brand" aria-hidden="true" />
+              <span>
+                <span className="font-semibold text-foreground">Desktop-first.</span>{' '}
+                Built mainly for PC viewing; mobile layout is still in progress.
+              </span>
+            </div>
+          )}
 
           <ul className="space-y-1.5 mb-5">
             {project.features.slice(0, 3).map((f) => (

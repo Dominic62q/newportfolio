@@ -18,6 +18,7 @@ export const projects = [
     id: 2,
     featured: true,
     staging: true,
+    desktopOnly: true,
     title: 'AssetTrack Pro',
     summary: 'Multi-tenant asset, maintenance, repairs, consumables, and QR tracking platform developed and staged for operational teams.',
     problem: 'Operational teams needed a scalable system for asset records, maintenance history, QR-code workflows, repairs, stores, and reporting.',
