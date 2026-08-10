@@ -1,6 +1,7 @@
 export const projects = [
   {
     id: 1,
+    featured: true,
     title: 'UGMC-Canteen / Mayrit Cuisines',
     summary: 'Hospital inventory and meal ordering platform with separate admin, kitchen, and nurse portals for real operational workflows.',
     problem: 'Healthcare meal and stock workflows needed a reliable system spanning ward orders, stores operations, kitchen coordination, role-based access, and reporting.',
@@ -15,6 +16,8 @@ export const projects = [
   },
   {
     id: 2,
+    featured: true,
+    staging: true,
     title: 'AssetTrack Pro',
     summary: 'Multi-tenant asset, maintenance, repairs, consumables, and QR tracking platform developed and staged for operational teams.',
     problem: 'Operational teams needed a scalable system for asset records, maintenance history, QR-code workflows, repairs, stores, and reporting.',
@@ -29,6 +32,7 @@ export const projects = [
   },
   {
     id: 3,
+    featured: true,
     title: 'MarianSave',
     summary: 'Offline-first desktop personal finance tracker for private local transaction management, summaries, reporting, and CSV export.',
     problem: 'Personal finance data needed a focused local-first experience that kept records private while still making trends and reporting easy to understand.',
@@ -43,6 +47,7 @@ export const projects = [
   },
   {
     id: 4,
+    featured: true,
     title: 'StudyHub API',
     summary: 'Backend-focused study collaboration platform connecting authenticated users by academic interests, subjects, groups, and shared resources.',
     problem: 'Students needed a structured way to find study partners and share resources around specific subjects.',

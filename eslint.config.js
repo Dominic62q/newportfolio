@@ -23,7 +23,16 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Core ESLint does not count JSX member expressions such as <motion.div>
+      // as usage without eslint-plugin-react. Keep the existing dependency set
+      // lean and ignore the shared motion namespace imports.
+      'no-unused-vars': ['error', { varsIgnorePattern: '^(motion|[A-Z_])' }],
+    },
+  },
+  {
+    files: ['api/**/*.js', 'vite.config.js'],
+    languageOptions: {
+      globals: globals.node,
     },
   },
 ])

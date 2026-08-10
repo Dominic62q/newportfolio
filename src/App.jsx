@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { MotionConfig } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -10,6 +11,7 @@ import Experience from './components/Experience'
 import Strengths from './components/Strengths'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import AmbientPill from './components/AmbientPill'
 import './index.css'
 
 function ScrollProgress() {
@@ -32,21 +34,24 @@ function ScrollProgress() {
 function App() {
   return (
     <ThemeProvider>
-      <ScrollProgress />
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <main id="main-content">
-          <Hero />
-          <Marquee />
-          <About />
-          <Projects />
-          <Stack />
-          <Experience />
-          <Strengths />
-          <Contact />
-        </main>
-        <Footer />
-      </div>
+      <MotionConfig reducedMotion="user">
+        <ScrollProgress />
+        <div className="min-h-screen bg-background text-foreground">
+          <Navbar />
+          <AmbientPill />
+          <main id="main-content">
+            <Hero />
+            <Marquee />
+            <About />
+            <Projects />
+            <Stack />
+            <Experience />
+            <Strengths />
+            <Contact />
+          </main>
+          <Footer />
+        </div>
+      </MotionConfig>
     </ThemeProvider>
   )
 }

@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import NowPlaying from './NowPlaying'
 
 export default function Hero() {
   return (
@@ -14,8 +13,7 @@ export default function Hero() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center lg:gap-12">
-          <div>
+        <div>
             <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -93,9 +91,6 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          <NowPlaying />
-        </div>
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -112,7 +107,7 @@ export default function Hero() {
               href={href}
               target={href.startsWith('mailto') ? undefined : '_blank'}
               rel="noopener noreferrer"
-              className="group flex items-center gap-2"
+              className="group inline-flex min-h-11 items-center gap-2"
             >
               <span className="text-[10px] font-mono text-brand/50 group-hover:text-brand transition-colors">{num}</span>
               <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{label} ↗</span>

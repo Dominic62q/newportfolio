@@ -8,7 +8,7 @@ export default function Footer() {
 
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="inline-flex items-center gap-2 text-xs text-muted-foreground/50 hover:text-brand transition-colors group"
+          className="inline-flex min-h-11 items-center gap-2 px-2 text-xs text-muted-foreground/50 hover:text-brand transition-colors group"
         >
           Back to top
           <span className="inline-flex w-5 h-5 border border-border rounded-full items-center justify-center group-hover:border-brand transition-colors">
