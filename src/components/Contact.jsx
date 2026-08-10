@@ -63,7 +63,7 @@ export default function Contact() {
             <span className="text-xs font-mono text-brand">06</span>
             <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Contact</span>
           </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
+          <h2 id="contact-heading" className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
             Let's work together.
           </h2>
           <p className="mt-4 text-muted-foreground text-base max-w-md">
@@ -91,6 +91,7 @@ export default function Contact() {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.5, delay: 0.1 }}
           onSubmit={handleSubmit}
+          aria-labelledby="contact-heading"
           className="max-w-lg"
         >
           <Card className="border-border bg-card shadow-none">
@@ -106,6 +107,7 @@ export default function Contact() {
                   required
                   value={form.name}
                   onChange={handleChange}
+                  autoComplete="name"
                   placeholder="Your name"
                   className="h-12 rounded-xl border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:border-brand focus-visible:ring-brand/20"
                 />
@@ -122,6 +124,8 @@ export default function Contact() {
                   required
                   value={form.email}
                   onChange={handleChange}
+                  autoComplete="email"
+                  inputMode="email"
                   placeholder="your@email.com"
                   className="h-12 rounded-xl border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground/40 focus-visible:border-brand focus-visible:ring-brand/20"
                 />
@@ -144,7 +148,12 @@ export default function Contact() {
               </div>
 
               {status.message && (
-                <p className={`text-sm ${status.type === 'success' ? 'text-emerald-600' : 'text-red-500'}`}>
+                <p
+                  role={status.type === 'error' ? 'alert' : 'status'}
+                  aria-live={status.type === 'error' ? 'assertive' : 'polite'}
+                  aria-atomic="true"
+                  className={`text-sm ${status.type === 'success' ? 'text-emerald-600' : 'text-red-500'}`}
+                >
                   {status.message}
                 </p>
               )}
@@ -153,7 +162,7 @@ export default function Contact() {
                 type="submit"
                 disabled={sending}
                 size="lg"
-                className="rounded-full bg-brand px-6 text-brand-foreground hover:brightness-90"
+                className="min-h-11 rounded-full bg-brand px-6 text-brand-foreground hover:brightness-90"
               >
                 {sending ? 'Sending...' : 'Send Message'}
                 {!sending && (

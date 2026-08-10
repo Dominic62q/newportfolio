@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Sun, Moon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useTheme } from '../context/ThemeContext'
+import { useTheme } from '../context/useTheme'
 
 const navLinks = [
   { label: 'About', href: '#about' },
@@ -18,8 +18,8 @@ function ThemeToggle() {
       onClick={toggle}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       variant="ghost"
-      size="icon-sm"
-      className="rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+      size="icon"
+      className="size-11 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
     >
       {isDark ? (
         <Sun className="size-4" />
@@ -78,7 +78,7 @@ export default function Navbar() {
           : 'bg-transparent'
       }`}
     >
-      <nav className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+      <nav aria-label="Primary navigation" className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
         <a
           href="#"
           onClick={(e) => handleNav(e, '#')}
@@ -96,11 +96,12 @@ export default function Navbar() {
                 <a
                   href={href}
                   onClick={(e) => handleNav(e, href)}
-                  className={`text-sm transition-colors relative ${
+                    className={`text-sm transition-colors relative ${
                     isActive
                       ? 'text-brand'
                       : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                    }`}
+                  aria-current={isActive ? 'location' : undefined}
                 >
                   {label}
                   {isActive && (
@@ -111,7 +112,7 @@ export default function Navbar() {
             )
           })}
           <li>
-            <Button asChild variant="outline" size="sm" className="rounded-full border-border bg-transparent px-4 text-foreground hover:border-brand hover:text-brand">
+            <Button asChild variant="outline" size="sm" className="min-h-11 rounded-full border-border bg-transparent px-4 text-foreground hover:border-brand hover:text-brand">
               <a href="/documents/Dominic-Amuah-Resume.pdf" download="Dominic-Amuah-Resume.pdf">
                 Resume
               </a>
@@ -125,9 +126,12 @@ export default function Navbar() {
         <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
           <button
-            className="flex flex-col gap-1.5 rounded-full p-1"
+            type="button"
+            className="flex size-11 flex-col items-center justify-center gap-1.5 rounded-full p-2.5"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           >
             <span className={`block h-0.5 w-6 bg-foreground transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
             <span className={`block h-0.5 w-6 bg-foreground transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
@@ -137,14 +141,15 @@ export default function Navbar() {
       </nav>
 
       {menuOpen && (
-        <div className="md:hidden border-b border-border bg-background px-6 pb-5 pt-2">
+        <div id="mobile-navigation" className="md:hidden border-b border-border bg-background px-6 pb-5 pt-2">
           <ul className="flex flex-col gap-4">
             {navLinks.map(({ label, href }) => (
               <li key={label}>
                 <a
                   href={href}
                   onClick={(e) => handleNav(e, href)}
-                  className="text-sm text-muted-foreground hover:text-brand transition-colors"
+                  className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:text-brand transition-colors"
+                  aria-current={active === href.replace('#', '') ? 'location' : undefined}
                 >
                   {label}
                 </a>
@@ -154,7 +159,7 @@ export default function Navbar() {
               <a
                 href="/documents/Dominic-Amuah-Resume.pdf"
                 download="Dominic-Amuah-Resume.pdf"
-                className="text-sm text-foreground font-medium hover:text-brand transition-colors"
+                className="inline-flex min-h-11 items-center text-sm text-foreground font-medium hover:text-brand transition-colors"
               >
                 Resume ↓
               </a>

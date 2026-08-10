@@ -24,6 +24,11 @@ function ProjectCard({ project, index }) {
               <CardTitle className="text-base leading-snug text-foreground transition-colors group-hover:text-brand">
                 {project.title}
               </CardTitle>
+              {project.staging && (
+                <Badge variant="outline" className="shrink-0 border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
+                  staging
+                </Badge>
+              )}
               {project.contributor && (
                 <Badge variant="outline" className="shrink-0 border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
                   contributor
@@ -32,16 +37,21 @@ function ProjectCard({ project, index }) {
             </div>
             <div className="flex items-center gap-3 shrink-0">
               {project.github && (
-                <Button asChild variant="link" size="sm" className="h-auto px-0 text-xs text-muted-foreground/60 hover:text-brand">
+                <Button asChild variant="link" size="sm" className="h-auto min-h-11 px-0 text-xs text-muted-foreground/60 hover:text-brand">
                   <a href={project.github} target="_blank" rel="noopener noreferrer">
                     GitHub ↗
                   </a>
                 </Button>
               )}
               {project.demo && (
-                <Button asChild variant="link" size="sm" className="h-auto px-0 text-xs text-muted-foreground/60 hover:text-brand">
-                  <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                    Live ↗
+                <Button asChild variant="link" size="sm" className="h-auto min-h-11 px-0 text-xs text-muted-foreground/60 hover:text-brand">
+                  <a
+                    href={project.demo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${project.staging ? 'Staging' : 'Live'} demo for ${project.title}`}
+                  >
+                    {project.staging ? 'Staging' : 'Live'} ↗
                   </a>
                 </Button>
               )}
@@ -81,6 +91,9 @@ function ProjectCard({ project, index }) {
 }
 
 export default function Projects() {
+  const featuredProjects = projects.filter((project) => project.featured)
+  const otherProjects = projects.filter((project) => !project.featured)
+
   return (
     <section id="projects" className="py-28 border-t border-border">
       <div className="max-w-4xl mx-auto px-6">
@@ -110,11 +123,66 @@ export default function Projects() {
           </a>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project, i) => (
+        <div className="grid gap-8 md:grid-cols-2">
+          {featuredProjects.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}
         </div>
+
+        {otherProjects.length > 0 && (
+          <div className="mt-16 border-t border-border pt-8">
+            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-mono uppercase tracking-[0.18em] text-brand">More work</p>
+                <p className="mt-2 text-sm text-muted-foreground">Additional products, contributions, and experiments.</p>
+              </div>
+              <a
+                href="https://github.com/Dominic62q"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center text-sm text-muted-foreground/70 transition-colors hover:text-brand"
+              >
+                Browse GitHub ↗
+              </a>
+            </div>
+
+            <div className="divide-y divide-border rounded-2xl border border-border">
+              {otherProjects.map((project) => (
+                <article key={project.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm font-semibold text-foreground">{project.title}</h3>
+                      {project.staging && (
+                        <Badge variant="outline" className="border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
+                          staging
+                        </Badge>
+                      )}
+                      {project.contributor && (
+                        <Badge variant="outline" className="border-border font-mono text-[10px] text-muted-foreground">
+                          contributor
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="mt-1 truncate text-xs text-muted-foreground">{project.stack.slice(0, 4).join(' · ')}</p>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-4 text-xs text-muted-foreground/70">
+                    {project.github && (
+                      <a href={project.github} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center transition-colors hover:text-brand">
+                        GitHub ↗
+                      </a>
+                    )}
+                    {project.demo && (
+                      <a href={project.demo} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center transition-colors hover:text-brand">
+                        {project.staging ? 'Staging' : 'Live'} ↗
+                      </a>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )
