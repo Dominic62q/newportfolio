@@ -6,7 +6,7 @@ export const experiences = [
     period: 'Sep 2024 – Present',
     bullets: [
       'Build and improve web applications, backend features, REST APIs, and internal tools for operational and healthcare workflows.',
-      'Contribute to UGMC-Canteen / Mayrit Cuisines, supporting inventory, ordering, ward-user flows, dashboards, uploads and imports, and reporting needs.',
+      'Built UGMC-Canteen / Mayrit Cuisines, including inventory, ordering, ward-user flows, dashboards, uploads and imports, and reporting workflows.',
       'Developed and staged AssetTrack Pro, a multi-tenant platform for asset registration, QR tracking, transfers, maintenance, repairs, consumables, RBAC, audit logs, and reporting.',
       'Authored and maintained the PMAG Day 2026 event site, refining sponsor tiers, board-member content, event resources, branding assets, and brochure presentation.',
       'Work across databases, authentication, permissions, UI integration, troubleshooting, documentation, testing support, and deployment workflows to improve product reliability.',

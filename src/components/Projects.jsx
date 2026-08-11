@@ -65,6 +65,18 @@ function ProjectCard({ project, index }) {
             {project.summary}
           </p>
 
+          {project.problem && (
+            <div className="relative mb-5 overflow-hidden rounded-xl border border-border bg-muted/40 px-4 py-3">
+              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand">
+                <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
+                What it solves
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                {project.problem}
+              </p>
+            </div>
+          )}
+
           {project.desktopOnly && (
             <div className="mb-5 flex items-start gap-2 rounded-xl border border-brand/20 bg-brand/5 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
               <Monitor className="mt-0.5 size-3.5 shrink-0 text-brand" aria-hidden="true" />
@@ -84,16 +96,19 @@ function ProjectCard({ project, index }) {
             ))}
           </ul>
 
-          <div className="flex flex-wrap gap-1.5">
-            {project.stack.map((tech) => (
-              <Badge
-                key={tech}
-                variant="outline"
-                className="rounded-full border-border bg-muted px-2.5 py-0.5 text-[11px] font-normal text-muted-foreground"
-              >
-                {tech}
-              </Badge>
-            ))}
+          <div>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/60">Built with</p>
+            <div className="flex flex-wrap gap-1.5">
+              {project.stack.map((tech) => (
+                <Badge
+                  key={tech}
+                  variant="outline"
+                  className="rounded-full border-border bg-muted px-2.5 py-0.5 text-[11px] font-normal text-muted-foreground transition-colors hover:border-brand/40 hover:text-brand"
+                >
+                  {tech}
+                </Badge>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
