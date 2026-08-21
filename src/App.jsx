@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
+import { UIProvider } from './context/UIContext'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
@@ -12,6 +13,11 @@ import Strengths from './components/Strengths'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import AmbientPill from './components/AmbientPill'
+import Terminal from './components/Terminal'
+import CommandPalette from './components/CommandPalette'
+import ContributionSnake, { ContributionSnakeSection } from './components/ContributionSnake'
+import KonamiEasterEgg from './components/KonamiEasterEgg'
+import SpeedrunTimer from './components/SpeedrunTimer'
 import './index.css'
 
 function ScrollProgress() {
@@ -34,27 +40,34 @@ function ScrollProgress() {
 function App() {
   return (
     <ThemeProvider>
-      <MotionConfig reducedMotion="user">
-        <ScrollProgress />
-        <div className="min-h-screen bg-background text-foreground">
-          <Navbar />
-          <AmbientPill />
-          <main id="main-content">
-            <Hero />
-            <Marquee />
-            <About />
-            <Projects />
-            <Stack />
-            <Experience />
-            <Strengths />
-            <Contact />
-          </main>
-          <Footer />
-        </div>
-      </MotionConfig>
+      <UIProvider>
+        <MotionConfig reducedMotion="user">
+          <ScrollProgress />
+          <div className="min-h-screen bg-background text-foreground">
+            <Navbar />
+            <AmbientPill />
+            <main id="main-content">
+              <Hero />
+              <Marquee />
+              <About />
+              <Projects />
+              <Stack />
+              <Experience />
+              <Strengths />
+              <ContributionSnakeSection />
+              <Contact />
+            </main>
+            <Footer />
+          </div>
+          <Terminal />
+          <CommandPalette />
+          <ContributionSnake />
+          <KonamiEasterEgg />
+          <SpeedrunTimer />
+        </MotionConfig>
+      </UIProvider>
     </ThemeProvider>
   )
 }
 
 export default App
-

@@ -6,23 +6,56 @@ import {
   CloudRain,
   CloudSun,
   ExternalLink,
+  GitCommit,
   Music2,
   Sun,
 } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useUI } from '../context/useUI'
 
 const MUSIC_REFRESH_INTERVAL = 5_000
 const WEATHER_REFRESH_INTERVAL = 10 * 60_000
+const COMMITS_REFRESH_INTERVAL = 5 * 60_000
 const WEATHER_URL =
   'https://api.open-meteo.com/v1/forecast?latitude=5.6037&longitude=-0.1870&current=temperature_2m,apparent_temperature,weather_code&timezone=Africa%2FAccra'
+const GITHUB_EVENTS_URL =
+  'https://api.github.com/users/Dominic62q/events/public?per_page=100'
 
-function Equalizer({ muted = false }) {
+function timeAgo(dateString) {
+  const elapsedMs = Date.now() - new Date(dateString).getTime()
+  const minutes = Math.floor(elapsedMs / 60_000)
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.floor(hours / 24)}d ago`
+}
+
+function latestCommitsFromEvents(events) {
+  const pushes = events.filter((event) => event.type === 'PushEvent')
+  const commits = []
+  for (const push of pushes) {
+    for (const commit of [...(push.payload?.commits ?? [])].reverse()) {
+      commits.push({
+        message: commit.message.split('\n')[0],
+        repo: push.repo.name.replace(/^Dominic62q\//, ''),
+        createdAt: push.created_at,
+        url: `https://github.com/${push.repo.name}/commit/${commit.sha}`,
+      })
+    }
+  }
+  return commits.slice(0, 5)
+}
+
+function Equalizer({ muted = false, boosted = false }) {
+  const animationStyle = boosted ? { animationDuration: '0.28s' } : undefined
+
   return (
     <span className={`flex items-end gap-0.5 ${muted ? 'opacity-40' : ''}`} aria-hidden="true">
-      <span className="h-1.5 w-0.5 rounded-full bg-brand" />
-      <span className="h-3 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:120ms]" />
-      <span className="h-2 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:240ms]" />
-      <span className="h-2.5 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:360ms]" />
+      <span className="h-1.5 w-0.5 animate-pulse rounded-full bg-brand" style={animationStyle} />
+      <span className="h-3 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:120ms]" style={animationStyle} />
+      <span className="h-2 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:240ms]" style={animationStyle} />
+      <span className="h-2.5 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:360ms]" style={animationStyle} />
     </span>
   )
 }
@@ -89,7 +122,7 @@ function Slide({ children, panel, reducedMotion }) {
   )
 }
 
-function MusicPanel({ track, progressPercent, loading }) {
+function MusicPanel({ track, progressPercent, loading, boosted }) {
   if (loading) {
     return (
       <div className="flex min-h-11 items-center gap-2.5 rounded-full border border-border bg-background/95 px-3 shadow-lg shadow-black/5 backdrop-blur-md">
@@ -108,7 +141,7 @@ function MusicPanel({ track, progressPercent, loading }) {
         aria-label="Spotify is offline"
       >
         <span className="flex min-w-0 items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          <Equalizer muted />
+          <Equalizer muted boosted={boosted} />
           <span className="truncate">Dominic&apos;s soundtrack</span>
         </span>
         <span className="flex shrink-0 items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70">
@@ -128,6 +161,9 @@ function MusicPanel({ track, progressPercent, loading }) {
       className="group relative flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 overflow-hidden rounded-full border border-brand/30 bg-background/95 px-2.5 pr-3.5 shadow-lg shadow-brand/10 backdrop-blur-md transition-colors hover:border-brand/70"
     >
       <AlbumArt imageUrl={track.imageUrl} />
+      <span className="hidden items-center sm:inline-flex">
+        <Equalizer boosted={boosted} />
+      </span>
 
       <span className="flex min-w-0 max-w-[18rem] items-center gap-1.5 text-left">
         <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-brand">
@@ -175,14 +211,49 @@ function WeatherPanel({ weather }) {
   )
 }
 
+function CommitsPanel({ commit }) {
+  const message = commit?.message ?? 'Building and shipping on GitHub'
+  const metadata = commit ? timeAgo(commit.createdAt) : '@Dominic62q'
+  const url = commit?.url ?? 'https://github.com/Dominic62q'
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={
+        commit
+          ? `Latest commit: ${commit.message} in ${commit.repo}, ${metadata}`
+          : 'GitHub profile: building and shipping on GitHub'
+      }
+      className="group flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 rounded-full border border-border bg-background/95 px-3 shadow-lg shadow-black/5 backdrop-blur-md transition-colors hover:border-brand/70"
+    >
+      <GitCommit className="size-4 shrink-0 text-brand" aria-hidden="true" />
+      <span className="flex min-w-0 items-center gap-1.5">
+        <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-brand">
+          Shipping
+        </span>
+        <span className="min-w-0 truncate text-xs font-semibold text-foreground">
+          {message}
+        </span>
+        <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+          · {metadata}
+        </span>
+      </span>
+    </a>
+  )
+}
+
 export default function AmbientPill() {
   const [track, setTrack] = useState(null)
   const [musicLoading, setMusicLoading] = useState(true)
   const [elapsedMs, setElapsedMs] = useState(0)
   const [weather, setWeather] = useState(null)
+  const [commits, setCommits] = useState([])
   const [panel, setPanel] = useState('music')
   const tickRef = useRef(null)
   const reducedMotion = useReducedMotion()
+  const { ambientBoosted } = useUI()
 
   const loadTrack = useCallback(async () => {
     try {
@@ -230,6 +301,20 @@ export default function AmbientPill() {
     }
   }, [])
 
+  const loadCommits = useCallback(async () => {
+    try {
+      const response = await fetch(GITHUB_EVENTS_URL, {
+        headers: { Accept: 'application/vnd.github+json' },
+        cache: 'no-store',
+      })
+      if (!response.ok) throw new Error('GitHub events request failed')
+      const events = await response.json()
+      setCommits(latestCommitsFromEvents(Array.isArray(events) ? events : []))
+    } catch {
+      setCommits([])
+    }
+  }, [])
+
   useEffect(() => {
     const initialTrackRequest = window.setTimeout(() => {
       void loadTrack()
@@ -237,16 +322,22 @@ export default function AmbientPill() {
     const initialWeatherRequest = window.setTimeout(() => {
       void loadWeather()
     }, 0)
+    const initialCommitsRequest = window.setTimeout(() => {
+      void loadCommits()
+    }, 0)
     const trackInterval = window.setInterval(loadTrack, MUSIC_REFRESH_INTERVAL)
     const weatherInterval = window.setInterval(loadWeather, WEATHER_REFRESH_INTERVAL)
+    const commitsInterval = window.setInterval(loadCommits, COMMITS_REFRESH_INTERVAL)
 
     return () => {
       window.clearTimeout(initialTrackRequest)
       window.clearTimeout(initialWeatherRequest)
+      window.clearTimeout(initialCommitsRequest)
       window.clearInterval(trackInterval)
       window.clearInterval(weatherInterval)
+      window.clearInterval(commitsInterval)
     }
-  }, [loadTrack, loadWeather])
+  }, [loadTrack, loadWeather, loadCommits])
 
   useEffect(() => {
     window.clearInterval(tickRef.current)
@@ -259,27 +350,39 @@ export default function AmbientPill() {
     return () => window.clearInterval(tickRef.current)
   }, [track])
 
+  const latestCommit = commits[0] ?? null
+  const rotation = ['music', 'commits']
+  if (weather) rotation.push('weather')
+  const rotationKey = rotation.join(',')
+
   useEffect(() => {
-    if (!weather) return undefined
+    if (rotation.length < 2) return undefined
 
     const interval = window.setInterval(() => {
-      setPanel((current) => (current === 'music' ? 'weather' : 'music'))
+      setPanel((current) => {
+        const index = rotation.indexOf(current)
+        return rotation[(index + 1) % rotation.length]
+      })
     }, 8_000)
 
     return () => window.clearInterval(interval)
-  }, [weather])
+  }, [rotationKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const progressPercent = track?.durationMs
     ? Math.min(100, (elapsedMs / track.durationMs) * 100)
     : 0
-  const visiblePanel = weather && panel === 'weather' ? 'weather' : 'music'
+  const visiblePanel = rotation.includes(panel) ? panel : 'music'
 
   return (
     <PillShell>
       <AnimatePresence initial={false} mode="wait">
-        {visiblePanel === 'weather' ? (
+        {visiblePanel === 'weather' && weather ? (
           <Slide key="weather" panel="weather" reducedMotion={reducedMotion}>
             <WeatherPanel weather={weather} />
+          </Slide>
+        ) : visiblePanel === 'commits' ? (
+          <Slide key="commits" panel="commits" reducedMotion={reducedMotion}>
+            <CommitsPanel commit={latestCommit} />
           </Slide>
         ) : (
           <Slide key="music" panel="music" reducedMotion={reducedMotion}>
@@ -287,6 +390,7 @@ export default function AmbientPill() {
               track={track}
               progressPercent={progressPercent}
               loading={musicLoading}
+              boosted={ambientBoosted}
             />
           </Slide>
         )}
