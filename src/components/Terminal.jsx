@@ -222,7 +222,7 @@ export default function Terminal() {
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm"
       onClick={() => setTerminalOpen(false)}
       role="dialog"
       aria-modal="true"
@@ -230,7 +230,7 @@ export default function Terminal() {
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-2xl overflow-hidden rounded-xl border border-neutral-700 bg-[#0d1117] shadow-2xl"
+        className="my-auto w-full max-w-2xl overflow-hidden rounded-xl border border-neutral-700 bg-[#0d1117] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-neutral-800 px-4 py-3">
@@ -252,7 +252,7 @@ export default function Terminal() {
 
         <div
           ref={bodyRef}
-          className="h-[22rem] overflow-y-auto p-4 font-mono text-[13px] leading-relaxed text-neutral-300"
+          className="h-[22rem] max-h-[60vh] overflow-y-auto p-4 font-mono text-[13px] leading-relaxed text-neutral-300"
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((line, i) => (

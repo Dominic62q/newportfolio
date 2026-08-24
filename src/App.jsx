@@ -18,6 +18,7 @@ import CommandPalette from './components/CommandPalette'
 import ContributionSnake, { ContributionSnakeSection } from './components/ContributionSnake'
 import KonamiEasterEgg from './components/KonamiEasterEgg'
 import SpeedrunTimer from './components/SpeedrunTimer'
+import Intro from './components/Intro'
 import './index.css'
 
 function ScrollProgress() {
@@ -64,6 +65,7 @@ function App() {
           <ContributionSnake />
           <KonamiEasterEgg />
           <SpeedrunTimer />
+          <Intro />
         </MotionConfig>
       </UIProvider>
     </ThemeProvider>

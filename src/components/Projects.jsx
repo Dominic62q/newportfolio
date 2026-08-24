@@ -1,23 +1,55 @@
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Monitor } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { TechLogo } from './TechLogo'
 import { projects } from '../data/projects'
-
 function ProjectCard({ project, index }) {
+  const tiltRef = useRef(null)
+
+  const handleTilt = (e) => {
+    if (e.pointerType === 'touch') return
+    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    const el = tiltRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const px = (e.clientX - rect.left) / rect.width
+    const py = (e.clientY - rect.top) / rect.height
+    const max = 8
+    el.style.setProperty('--ry', ((px - 0.5) * 2 * max).toFixed(2) + 'deg')
+    el.style.setProperty('--rx', (-(py - 0.5) * 2 * max).toFixed(2) + 'deg')
+    el.style.setProperty('--mx', (px * 100).toFixed(1) + '%')
+    el.style.setProperty('--my', (py * 100).toFixed(1) + '%')
+  }
+
+  const resetTilt = () => {
+    const el = tiltRef.current
+    if (!el) return
+    el.style.setProperty('--rx', '0deg')
+    el.style.setProperty('--ry', '0deg')
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.55, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative"
+      className="group relative [perspective:1000px]"
     >
       <span className="absolute -top-3 -left-1 font-mono text-[10px] text-brand/40 group-hover:text-brand transition-colors">
         {String(index + 1).padStart(2, '0')}
       </span>
 
+      <div
+        ref={tiltRef}
+        onPointerMove={handleTilt}
+        onPointerLeave={resetTilt}
+        className="relative transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
+        style={{ transform: 'rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))' }}
+      >
       <Card className="border-border bg-card shadow-none transition-all duration-300 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/5">
         <CardHeader className="gap-3">
           <div className="flex items-start justify-between gap-4">
@@ -100,18 +132,18 @@ function ProjectCard({ project, index }) {
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/60">Built with</p>
             <div className="flex flex-wrap gap-1.5">
               {project.stack.map((tech) => (
-                <Badge
-                  key={tech}
-                  variant="outline"
-                  className="rounded-full border-border bg-muted px-2.5 py-0.5 text-[11px] font-normal text-muted-foreground transition-colors hover:border-brand/40 hover:text-brand"
-                >
-                  {tech}
-                </Badge>
+                <TechLogo key={tech} name={tech} variant="chip" />
               ))}
             </div>
           </div>
         </CardContent>
       </Card>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: 'radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(249,115,22,0.18), transparent 45%)' }}
+        />
+      </div>
     </motion.div>
   )
 }
