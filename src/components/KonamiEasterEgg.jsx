@@ -20,7 +20,21 @@ const CONFETTI_COLORS = ['#f97316', '#22c55e', '#3b82f6', '#eab308', '#ec4899']
 const STACK_LABELS = stackGroups.flatMap(({ items }) => items).filter(Boolean)
 
 function fireConfetti(labels) {
+  if (typeof window === 'undefined') return
+  const reduceMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduceMotion) return
+
+  // Avoid stacking duplicate canvases on rapid re-trigger.
+  const existing = document.getElementById('konami-confetti')
+  if (existing) existing.remove()
+
+  const isNarrow = window.innerWidth < 640
+  const count = isNarrow ? 90 : 140
+
   const canvas = document.createElement('canvas')
+  canvas.id = 'konami-confetti'
   canvas.style.cssText =
     'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:9999'
   document.body.appendChild(canvas)
@@ -34,14 +48,32 @@ function fireConfetti(labels) {
   canvas.height = window.innerHeight * dpr
   ctx.scale(dpr, dpr)
 
-  const spawnSide = Math.random() < 0.5 ? -1 : 1
-  const originX = spawnSide === -1 ? 0 : window.innerWidth
-  const particles = Array.from({ length: 140 }, () => {
-    const angle = (Math.random() * Math.PI / 3) + (spawnSide === -1 ? 0 : Math.PI / 2)
+  // Wide screens keep the single corner cannon. Narrow/mobile gets a
+  // center-bottom burst so confetti fills the full width instead of
+  // arcing lopsidedly from one edge.
+  const spawnOrigin = () => {
+    if (isNarrow) {
+      const spread = window.innerWidth * 0.6
+      return {
+        x: window.innerWidth / 2 + (Math.random() - 0.5) * spread,
+        y: window.innerHeight * 0.92,
+        angle: Math.PI / 2 + (Math.random() - 0.5) * (Math.PI / 1.5),
+      }
+    }
+    const side = Math.random() < 0.5 ? -1 : 1
+    return {
+      x: side === -1 ? 0 : window.innerWidth,
+      y: window.innerHeight + 10,
+      angle: side === -1 ? Math.random() * (Math.PI / 3) : Math.PI / 2 + Math.random() * (Math.PI / 3),
+    }
+  }
+
+  const particles = Array.from({ length: count }, () => {
+    const { x: originX, y: originY, angle } = spawnOrigin()
     const speed = 9 + Math.random() * 9
     return {
       x: originX,
-      y: window.innerHeight + 10,
+      y: originY,
       vx: Math.cos(angle) * speed,
       vy: -Math.abs(Math.sin(angle)) * speed - 6,
       size: 5 + Math.random() * 6,

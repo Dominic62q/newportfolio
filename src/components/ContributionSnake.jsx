@@ -87,6 +87,14 @@ function SnakeGame({ isDark }) {
     return () => window.clearTimeout(t)
   }, [loadContributions])
 
+  const enqueueDir = useCallback(
+    (dir) => {
+      if (queueRef.current.length < 3) queueRef.current.push(dir)
+      setStarted(true)
+    },
+    [],
+  )
+
   const handleKeyDown = (e) => {
     const dirs = {
       ArrowUp: { x: 0, y: -1 },
@@ -103,8 +111,24 @@ function SnakeGame({ isDark }) {
     if (!dir) return
 
     e.preventDefault()
-    if (queueRef.current.length < 3) queueRef.current.push(dir)
-    setStarted(true)
+    enqueueDir(dir)
+  }
+
+  const touchStartRef = useRef(null)
+  const handleTouchStart = (e) => {
+    const t = e.changedTouches[0]
+    touchStartRef.current = { x: t.clientX, y: t.clientY }
+  }
+  const handleTouchEnd = (e) => {
+    const start = touchStartRef.current
+    touchStartRef.current = null
+    if (!start) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - start.x
+    const dy = t.clientY - start.y
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return
+    if (Math.abs(dx) > Math.abs(dy)) enqueueDir({ x: dx > 0 ? 1 : -1, y: 0 })
+    else enqueueDir({ x: 0, y: dy > 0 ? 1 : -1 })
   }
 
   const startGame = () => {
@@ -198,6 +222,9 @@ function SnakeGame({ isDark }) {
             role="group"
             aria-label="Playable GitHub contribution graph"
             onKeyDown={handleKeyDown}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            style={{ touchAction: 'none' }}
             className="relative w-full overflow-hidden rounded-lg border border-border bg-muted/30 outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
           >
             <div
@@ -284,8 +311,8 @@ function SnakeGame({ isDark }) {
           <div className="mt-4 flex flex-col items-center justify-center gap-3 text-center sm:flex-row">
             <p className="font-mono text-xs text-muted-foreground">
               {started
-                ? 'Arrow keys / WASD to steer · edges wrap around'
-                : 'Click the graph, then use arrow keys or WASD'}
+                ? 'Edges wrap around · eat the orange dot'
+                : 'Start the snake, then steer with keys, swipe, or the pad'}
             </p>
             {!started && (
               <button
@@ -296,6 +323,48 @@ function SnakeGame({ isDark }) {
                 Start Snake
               </button>
             )}
+          </div>
+
+          <div className="mx-auto mt-4 grid max-w-[200px] grid-cols-3 gap-2 [@media(pointer:fine)]:hidden">
+            <span />
+            <button
+              type="button"
+              aria-label="Steer up"
+              onClick={() => enqueueDir({ x: 0, y: -1 })}
+              className="flex min-h-12 min-w-12 items-center justify-center rounded-lg border border-border bg-muted/40 text-lg text-foreground active:bg-brand active:text-brand-foreground"
+            >
+              ▲
+            </button>
+            <span />
+            <button
+              type="button"
+              aria-label="Steer left"
+              onClick={() => enqueueDir({ x: -1, y: 0 })}
+              className="flex min-h-12 min-w-12 items-center justify-center rounded-lg border border-border bg-muted/40 text-lg text-foreground active:bg-brand active:text-brand-foreground"
+            >
+              ◀
+            </button>
+            <span className="flex items-center justify-center font-mono text-xs text-muted-foreground">
+              {score}
+            </span>
+            <button
+              type="button"
+              aria-label="Steer right"
+              onClick={() => enqueueDir({ x: 1, y: 0 })}
+              className="flex min-h-12 min-w-12 items-center justify-center rounded-lg border border-border bg-muted/40 text-lg text-foreground active:bg-brand active:text-brand-foreground"
+            >
+              ▶
+            </button>
+            <span />
+            <button
+              type="button"
+              aria-label="Steer down"
+              onClick={() => enqueueDir({ x: 0, y: 1 })}
+              className="flex min-h-12 min-w-12 items-center justify-center rounded-lg border border-border bg-muted/40 text-lg text-foreground active:bg-brand active:text-brand-foreground"
+            >
+              ▼
+            </button>
+            <span />
           </div>
         </>
       )}
