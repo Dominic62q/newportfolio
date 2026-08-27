@@ -196,3 +196,43 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* ---- Stack constellation -------------------------------------------------- */
+
+/* Starfield backdrop on the dark constellation board */
+.stack-stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, rgba(255, 255, 255, 0.35) 50%, transparent 50%),
+    radial-gradient(1px 1px at 34% 68%, rgba(255, 255, 255, 0.25) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 57% 15%, rgba(255, 255, 255, 0.3) 50%, transparent 50%),
+    radial-gradient(1px 1px at 73% 47%, rgba(255, 255, 255, 0.3) 50%, transparent 50%),
+    radial-gradient(1px 1px at 88% 79%, rgba(255, 255, 255, 0.25) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 46% 88%, rgba(255, 255, 255, 0.2) 50%, transparent 50%),
+    radial-gradient(1px 1px at 8% 85%, rgba(255, 255, 255, 0.2) 50%, transparent 50%);
+}
+
+/* Flashlight effect: tiles are dim and desaturated until the light reaches
+   them (class toggled from rAF in StackConstellation). Transition keeps the
+   reveal soft; gradient/opacity only, so it stays cheap. */
+.stack-tile {
+  filter: grayscale(0.75) brightness(0.7);
+  opacity: 0.45;
+  transition:
+    filter 0.35s ease,
+    opacity 0.35s ease,
+    transform 0.3s ease;
+}
+
+.stack-tile.is-lit {
+  filter: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack-tile {
+    /* no torch animation under reduced motion — keep everything readable */
+    filter: none;
+    opacity: 1;
+  }
+}
+

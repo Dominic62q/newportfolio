@@ -70,5 +70,6 @@ export function resolveTech(label) {
   if (!label) return null
   const norm = normalize(label)
   const key = ALIAS[norm] ?? norm
-  return KEY_TO_TECH[key] ?? null
+  const resolved = KEY_TO_TECH[key]
+  return resolved ? { key, ...resolved } : null
 }
