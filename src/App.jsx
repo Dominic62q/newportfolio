@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
 import { UIProvider } from './context/UIContext'
@@ -13,27 +13,51 @@ import Strengths from './components/Strengths'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import AmbientPill from './components/AmbientPill'
-import Terminal from './components/Terminal'
-import CommandPalette from './components/CommandPalette'
-import ContributionSnake, { ContributionSnakeSection } from './components/ContributionSnake'
-import KonamiEasterEgg from './components/KonamiEasterEgg'
-import SpeedrunTimer from './components/SpeedrunTimer'
 import Intro from './components/Intro'
 import './index.css'
 
+// Interactive extras that are usually hidden (returned null until opened).
+// They are code-split so their JS is not part of the initial page load.
+const Terminal = lazy(() => import('./components/Terminal'))
+const CommandPalette = lazy(() => import('./components/CommandPalette'))
+const KonamiEasterEgg = lazy(() => import('./components/KonamiEasterEgg'))
+const SpeedrunTimer = lazy(() => import('./components/SpeedrunTimer'))
+const ContributionSnakeSection = lazy(() =>
+  import('./components/ContributionSnake').then((m) => ({ default: m.ContributionSnakeSection })),
+)
+const ContributionSnake = lazy(() =>
+  import('./components/ContributionSnake').then((m) => ({ default: m.default })),
+)
+
 function ScrollProgress() {
-  const [pct, setPct] = useState(0)
+  const barRef = useRef(null)
   useEffect(() => {
-    const onScroll = () => {
+    let ticking = false
+    const update = () => {
+      ticking = false
       const total = document.documentElement.scrollHeight - window.innerHeight
-      setPct(total > 0 ? (window.scrollY / total) * 100 : 0)
+      const pct = total > 0 ? (window.scrollY / total) * 100 : 0
+      if (barRef.current) barRef.current.style.width = `${pct}%`
     }
+    // Throttle to one update per animation frame and write the style straight
+    // to the DOM node, so scrolling never triggers a React re-render.
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true
+        requestAnimationFrame(update)
+      }
+    }
+    update()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
   }, [])
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-[2px] pointer-events-none">
-      <div className="h-full bg-brand" style={{ width: `${pct}%`, transition: 'width 0.05s linear' }} />
+      <div ref={barRef} className="h-full w-0 bg-brand" />
     </div>
   )
 }
@@ -55,16 +79,22 @@ function App() {
               <Stack />
               <Experience />
               <Strengths />
-              <ContributionSnakeSection />
+              <Suspense fallback={null}>
+                <ContributionSnakeSection />
+              </Suspense>
               <Contact />
             </main>
             <Footer />
           </div>
-          <Terminal />
-          <CommandPalette />
-          <ContributionSnake />
-          <KonamiEasterEgg />
-          <SpeedrunTimer />
+          {/* Overlay widgets are lazy-loaded chunks; Suspense renders nothing
+              until they are actually opened, so there is no visual impact. */}
+          <Suspense fallback={null}>
+            <Terminal />
+            <CommandPalette />
+            <ContributionSnake />
+            <KonamiEasterEgg />
+            <SpeedrunTimer />
+          </Suspense>
           <Intro />
         </MotionConfig>
       </UIProvider>

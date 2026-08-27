@@ -46,5 +46,19 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // Split stable vendor dependencies into cacheable chunks so app code
+          // changes do not invalidate them on redeploy.
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined
+            if (id.includes('framer-motion') || id.includes('motion')) return 'motion'
+            if (id.includes('react')) return 'vendor-react'
+            return 'vendor'
+          },
+        },
+      },
+    },
   }
 })
