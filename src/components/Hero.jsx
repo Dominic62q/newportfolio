@@ -14,19 +14,6 @@ export default function Hero() {
 
       <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
         <div>
-            <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2.5 mb-10 rounded-full border border-border bg-card px-4 py-2 text-xs text-muted-foreground"
-        >
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand" />
-          </span>
-          Available for work - Accra, Ghana
-            </motion.div>
-
             <motion.h1
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
