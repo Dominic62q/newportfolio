@@ -22,14 +22,7 @@ function fuzzyScore(query, text) {
 }
 
 export default function CommandPalette() {
-  const {
-    paletteOpen,
-    setPaletteOpen,
-    setTerminalOpen,
-    setSnakeOpen,
-    terminalOpen,
-    snakeOpen,
-  } = useUI()
+  const { paletteOpen, setPaletteOpen } = useUI()
   const { isDark, toggle } = useTheme()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(0)
@@ -42,13 +35,17 @@ export default function CommandPalette() {
   const commands = useMemo(
     () => [
       ...[
-        { label: 'Go to About', hint: 'section', action: () => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }) },
-        { label: 'Go to Projects', hint: 'section', action: () => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' }) },
-        { label: 'Go to Stack', hint: 'section', action: () => document.getElementById('stack')?.scrollIntoView({ behavior: 'smooth' }) },
-        { label: 'Go to Experience', hint: 'section', action: () => document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' }) },
-        { label: 'Go to Contact', hint: 'section', action: () => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) },
-        { label: 'Go to Playground', hint: 'section', action: () => document.getElementById('playground')?.scrollIntoView({ behavior: 'smooth' }) },
-      ],
+        { label: 'Go to About', id: 'about' },
+        { label: 'Go to Selected work', id: 'projects' },
+        { label: 'Go to Stack', id: 'stack' },
+        { label: 'Go to Experience', id: 'experience' },
+        { label: 'Go to Capabilities', id: 'strengths' },
+        { label: 'Go to Contact', id: 'contact' },
+      ].map(({ label, id }) => ({
+        label,
+        hint: 'section',
+        action: () => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }),
+      })),
       ...projects.map((p) => ({
         label: p.title,
         hint: 'project',
@@ -66,19 +63,18 @@ export default function CommandPalette() {
         action: toggle,
       },
       {
-        label: 'Open terminal',
-        hint: 'action',
-        keywords: 'shell bash console',
-        action: () => setTerminalOpen(true),
-      },
-      {
-        label: 'Play snake on the contribution graph',
-        hint: 'game',
-        keywords: 'github contributions game',
-        action: () => setSnakeOpen(true),
+        label: 'Download résumé',
+        hint: 'file',
+        keywords: 'cv resume pdf',
+        action: () => {
+          const link = document.createElement('a')
+          link.href = '/documents/Dominic-Amuah-Resume.pdf'
+          link.download = 'Dominic-Amuah-Resume.pdf'
+          link.click()
+        },
       },
     ],
-    [isDark, toggle, setTerminalOpen, setSnakeOpen],
+    [isDark, toggle],
   )
 
   const results = useMemo(() => {
@@ -98,7 +94,6 @@ export default function CommandPalette() {
   useEffect(() => {
     const onKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        if (terminalOpen || snakeOpen) return
         e.preventDefault()
         setPaletteOpen((open) => {
           if (!open) {
@@ -112,7 +107,7 @@ export default function CommandPalette() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [setPaletteOpen, snakeOpen, terminalOpen])
+  }, [setPaletteOpen])
 
   useEffect(() => {
     if (!paletteOpen) return undefined
@@ -149,7 +144,7 @@ export default function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-[95] flex items-start justify-center bg-black/50 p-4 pt-[12vh] backdrop-blur-sm"
+      className="fixed inset-0 z-[95] flex items-start justify-center bg-black/55 p-4 pt-[12vh] backdrop-blur-md"
       onClick={() => setPaletteOpen(false)}
       role="dialog"
       aria-modal="true"
@@ -157,7 +152,7 @@ export default function CommandPalette() {
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-lg overflow-hidden rounded-xl border border-border bg-background shadow-2xl"
+        className="w-full max-w-lg overflow-hidden rounded-md border border-ink/20 bg-paper shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]"
         onClick={(e) => e.stopPropagation()}
       >
         <input
@@ -168,13 +163,13 @@ export default function CommandPalette() {
             setSelected(0)
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Type a command or search..."
+          placeholder="Jump to a section, project or action…"
           aria-label="Search commands"
-          className="w-full border-b border-border bg-transparent px-4 py-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none"
+          className="w-full border-b border-rule bg-transparent px-5 py-4 font-serif text-[1.35rem] text-ink placeholder:text-mute/60 outline-none"
         />
         <ul ref={listRef} className="max-h-72 overflow-y-auto p-2">
           {results.length === 0 && (
-            <li className="px-3 py-6 text-center text-sm text-muted-foreground">
+            <li className="px-3 py-6 text-center text-sm text-mute">
               No results for &ldquo;{query}&rdquo;
             </li>
           )}
@@ -185,21 +180,21 @@ export default function CommandPalette() {
                 data-selected={i === activeIndex}
                 onMouseEnter={() => setSelected(i)}
                 onClick={() => runCommand(command)}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
+                className={`flex w-full items-center justify-between rounded-sm px-3 py-2.5 text-left text-sm transition-colors ${
                   i === activeIndex
-                    ? 'bg-brand/10 text-brand'
-                    : 'text-foreground hover:bg-muted'
+                    ? 'bg-ink text-paper'
+                    : 'text-ink hover:bg-paper-deep'
                 }`}
               >
                 <span className="truncate">{command.label}</span>
-                <span className="ml-3 shrink-0 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+                <span className="ml-3 shrink-0 font-mono text-[10px] uppercase tracking-wider opacity-60">
                   {command.hint}
                 </span>
               </button>
             </li>
           ))}
         </ul>
-        <div className="flex items-center gap-4 border-t border-border px-4 py-2 font-mono text-[10px] text-muted-foreground/60">
+        <div className="flex items-center gap-4 border-t border-rule px-4 py-2 font-mono text-[10px] text-mute">
           <span>&uarr;&darr; navigate</span>
           <span>&crarr; select</span>
           <span>esc close</span>

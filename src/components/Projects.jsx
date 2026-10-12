@@ -1,247 +1,327 @@
-import { useRef } from 'react'
-import { motion } from 'framer-motion'
-import { Monitor } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useRef, useState, useSyncExternalStore } from 'react'
+import { AnimatePresence, motion, useDragControls } from 'framer-motion'
+import { useModalA11y } from '../lib/useModalA11y'
+import Reveal from './Reveal'
+import Section from './Section'
 import { TechLogo } from './TechLogo'
 import { projects } from '../data/projects'
-function ProjectCard({ project, index }) {
-  const tiltRef = useRef(null)
 
-  const handleTilt = (e) => {
-    if (e.pointerType === 'touch') return
-    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
-    const el = tiltRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const px = (e.clientX - rect.left) / rect.width
-    const py = (e.clientY - rect.top) / rect.height
-    const max = 8
-    el.style.setProperty('--ry', ((px - 0.5) * 2 * max).toFixed(2) + 'deg')
-    el.style.setProperty('--rx', (-(py - 0.5) * 2 * max).toFixed(2) + 'deg')
-    el.style.setProperty('--mx', (px * 100).toFixed(1) + '%')
-    el.style.setProperty('--my', (py * 100).toFixed(1) + '%')
-  }
+const EASE = [0.22, 1, 0.36, 1]
 
-  const resetTilt = () => {
-    const el = tiltRef.current
-    if (!el) return
-    el.style.setProperty('--rx', '0deg')
-    el.style.setProperty('--ry', '0deg')
-  }
-
+function Flag({ children }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.55, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative [perspective:1000px]"
-    >
-      <span className="absolute -top-3 -left-1 font-mono text-[10px] text-brand/40 group-hover:text-brand transition-colors">
-        {String(index + 1).padStart(2, '0')}
-      </span>
+    <span className="rounded-full border border-signal/40 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-signal">
+      {children}
+    </span>
+  )
+}
 
-      <div
-        ref={tiltRef}
-        onPointerMove={handleTilt}
-        onPointerLeave={resetTilt}
-        className="relative transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
-        style={{ transform: 'rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))' }}
-      >
-      <Card className="border-border bg-card shadow-none transition-all duration-300 hover:border-brand/40 hover:shadow-lg hover:shadow-brand/5">
-        <CardHeader className="gap-3">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base leading-snug text-foreground transition-colors group-hover:text-brand">
-                {project.title}
-              </CardTitle>
-              {project.staging && (
-                <Badge variant="outline" className="shrink-0 border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
-                  staging
-                </Badge>
-              )}
-              {project.contributor && (
-                <Badge variant="outline" className="shrink-0 border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
-                  contributor
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              {project.github && (
-                <Button asChild variant="link" size="sm" className="h-auto min-h-11 px-0 text-xs text-muted-foreground/60 hover:text-brand">
-                  <a href={project.github} target="_blank" rel="noopener noreferrer">
-                    GitHub ↗
-                  </a>
-                </Button>
-              )}
-              {project.demo && (
-                <Button asChild variant="link" size="sm" className="h-auto min-h-11 px-0 text-xs text-muted-foreground/60 hover:text-brand">
-                  <a
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${project.staging ? 'Staging' : 'Live'} demo for ${project.title}`}
-                  >
-                    {project.staging ? 'Staging' : 'Live'} ↗
-                  </a>
-                </Button>
-              )}
-            </div>
-          </div>
-        </CardHeader>
+function ProjectLinks({ project }) {
+  const linkClass =
+    'link-u inline-flex min-h-11 items-center gap-1.5 text-[15px] font-medium text-ink hover:text-signal'
+  return (
+    <div className="flex flex-wrap items-center gap-x-7">
+      {project.demo && (
+        <a
+          href={project.demo}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+          aria-label={`${project.staging ? 'Staging' : 'Live'} site for ${project.title}`}
+        >
+          {project.staging ? 'View staging' : 'Visit live site'} ↗
+        </a>
+      )}
+      {project.github && (
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+          aria-label={`Source code for ${project.title} on GitHub`}
+        >
+          Source on GitHub ↗
+        </a>
+      )}
+    </div>
+  )
+}
 
-        <CardContent>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-            {project.summary}
-          </p>
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.065, delayChildren: 0.04 } },
+}
+const rise = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+}
 
-          {project.problem && (
-            <div className="relative mb-5 overflow-hidden rounded-xl border border-border bg-muted/40 px-4 py-3">
-              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-brand">
-                <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
-                What it solves
-              </div>
-              <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                {project.problem}
-              </p>
-            </div>
-          )}
+// Case-study body, shared by the sticky desktop panel and the mobile accordion.
+// Each block rises in turn whenever the project changes.
+function Detail({ project }) {
+  return (
+    <motion.div initial="hidden" animate="show" variants={stagger}>
+      <motion.div variants={rise} className="flex flex-wrap items-center gap-2">
+        {project.staging && <Flag>Staging</Flag>}
+        {project.contributor && <Flag>Contributor</Flag>}
+        {project.desktopOnly && <Flag>Desktop-first</Flag>}
+      </motion.div>
 
-          {project.desktopOnly && (
-            <div className="mb-5 flex items-start gap-2 rounded-xl border border-brand/20 bg-brand/5 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-              <Monitor className="mt-0.5 size-3.5 shrink-0 text-brand" aria-hidden="true" />
-              <span>
-                <span className="font-semibold text-foreground">Desktop-first.</span>{' '}
-                Built mainly for PC viewing; mobile layout is still in progress.
-              </span>
-            </div>
-          )}
+      <motion.p variants={rise} className="mt-5 text-[17px] leading-[1.65]">
+        {project.summary}
+      </motion.p>
 
-          <ul className="space-y-1.5 mb-5">
-            {project.features.slice(0, 3).map((f) => (
-              <li key={f} className="text-xs text-muted-foreground flex items-start gap-2">
-                <span className="text-brand/40 mt-0.5 shrink-0">→</span>
-                {f}
-              </li>
-            ))}
-          </ul>
+      {project.problem && (
+        <motion.figure variants={rise} className="mt-8 border-l-2 border-signal pl-5">
+          <figcaption className="eyebrow mb-2 !text-signal">The problem</figcaption>
+          <blockquote className="font-serif text-[1.35rem] italic leading-[1.3]">{project.problem}</blockquote>
+        </motion.figure>
+      )}
 
-          <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/60">Built with</p>
-            <div className="flex flex-wrap gap-1.5">
-              {project.stack.map((tech) => (
-                <TechLogo key={tech} name={tech} variant="chip" />
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ background: 'radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(249,115,22,0.18), transparent 45%)' }}
-        />
-      </div>
+      <ol className="mt-8 space-y-3">
+        {project.features.map((feature, i) => (
+          <motion.li key={feature} variants={rise} className="grid grid-cols-[2rem_1fr] text-[15px] leading-relaxed text-mute">
+            <span className="eyebrow pt-[3px]">{String(i + 1).padStart(2, '0')}</span>
+            {feature}
+          </motion.li>
+        ))}
+      </ol>
+
+      <motion.div variants={rise} className="mt-8 flex flex-wrap gap-2">
+        {project.stack.map((tech) => (
+          <TechLogo key={tech} name={tech} />
+        ))}
+      </motion.div>
+
+      {project.desktopOnly && (
+        <motion.p variants={rise} className="mt-6 text-sm text-mute">
+          Built mainly for PC viewing; the mobile layout is still in progress.
+        </motion.p>
+      )}
+
+      <motion.div variants={rise} className="mt-6 border-t border-rule pt-2">
+        <ProjectLinks project={project} />
+      </motion.div>
     </motion.div>
   )
 }
 
-export default function Projects() {
-  const featuredProjects = projects.filter((project) => project.featured)
-  const otherProjects = projects.filter((project) => !project.featured)
+const DESKTOP_QUERY = '(min-width: 1024px)'
+function useIsDesktop() {
+  return useSyncExternalStore(
+    (notify) => {
+      const mq = window.matchMedia(DESKTOP_QUERY)
+      mq.addEventListener('change', notify)
+      return () => mq.removeEventListener('change', notify)
+    },
+    () => window.matchMedia(DESKTOP_QUERY).matches,
+    () => true,
+  )
+}
+
+// Touch layouts: the case study opens in a bottom sheet so the list never
+// reflows under your thumb. Drag the handle down to dismiss.
+function ProjectSheet({ project, index, total, onClose, onStep }) {
+  const sheetRef = useRef(null)
+  const closeRef = useRef(null)
+  const controls = useDragControls()
+  useModalA11y(true, sheetRef, closeRef)
 
   return (
-    <section id="projects" className="py-28 border-t border-border">
-      <div className="max-w-4xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-          className="flex items-end justify-between gap-6 mb-14"
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-xs font-mono text-brand">02</span>
-              <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Projects</span>
+    <>
+      <motion.div
+        aria-hidden="true"
+        className="fixed inset-0 z-[74] bg-ink/45 backdrop-blur-[2px]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        onClick={onClose}
+      />
+      <motion.div
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={project.title}
+        onKeyDown={(e) => e.key === 'Escape' && onClose()}
+        className="fixed inset-x-0 bottom-0 z-[75] mx-auto flex max-h-[90svh] max-w-2xl flex-col rounded-t-[1.5rem] border border-b-0 border-rule bg-paper shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.45)]"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ duration: 0.5, ease: EASE }}
+        drag="y"
+        dragListener={false}
+        dragControls={controls}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.6 }}
+        onDragEnd={(_, info) => (info.offset.y > 110 || info.velocity.y > 600) && onClose()}
+      >
+        <div className="shrink-0 touch-none px-6 pb-4 pt-3" onPointerDown={(e) => controls.start(e)}>
+          <span aria-hidden="true" className="mx-auto mb-4 block h-1 w-10 rounded-full bg-rule" />
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="eyebrow mb-1.5">
+                Case {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
+              </p>
+              <h3 className="display text-[1.9rem] leading-[1.05]">{project.title}</h3>
             </div>
-            <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
-              Things I've built.
-            </h2>
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              aria-label="Close project"
+              className="-mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-full font-mono text-sm text-mute hover:text-ink"
+            >
+              ✕
+            </button>
           </div>
-          <a
-            href="https://github.com/Dominic62q"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 text-sm text-muted-foreground/60 hover:text-brand transition-colors shrink-0"
-          >
-            All on GitHub ↗
-          </a>
-        </motion.div>
-
-        <div className="grid gap-8 md:grid-cols-2">
-          {featuredProjects.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} />
-          ))}
         </div>
 
-        {otherProjects.length > 0 && (
-          <div className="mt-16 border-t border-border pt-8">
-            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-xs font-mono uppercase tracking-[0.18em] text-brand">More work</p>
-                <p className="mt-2 text-sm text-muted-foreground">Additional products, contributions, and experiments.</p>
-              </div>
-              <a
-                href="https://github.com/Dominic62q"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center text-sm text-muted-foreground/70 transition-colors hover:text-brand"
+        <div key={project.id} className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-rule px-6 pb-6 pt-6">
+          <Detail project={project} />
+        </div>
+
+        <div className="flex shrink-0 items-center justify-between border-t border-rule px-6 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => onStep(-1)}
+            className="inline-flex min-h-11 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute hover:text-ink"
+          >
+            ← Prev
+          </button>
+          <span className="eyebrow">{String(index + 1).padStart(2, '0')}</span>
+          <button
+            type="button"
+            onClick={() => onStep(1)}
+            className="inline-flex min-h-11 items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-mute hover:text-ink"
+          >
+            Next →
+          </button>
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
+export default function Projects() {
+  const [activeId, setActiveId] = useState(projects[0].id)
+  const [sheetId, setSheetId] = useState(null)
+  const isDesktop = useIsDesktop()
+  const active = projects.find((p) => p.id === activeId) ?? projects[0]
+  const sheetIndex = isDesktop ? -1 : projects.findIndex((p) => p.id === sheetId)
+  const stepSheet = (dir) => setSheetId(projects[(sheetIndex + dir + projects.length) % projects.length].id)
+  const select = (id) => (isDesktop ? setActiveId(id) : setSheetId(id))
+
+  return (
+    <Section
+      id="projects"
+      index="02"
+      label="Selected work"
+      title="Things I've *built.*"
+      aside={
+        <a
+          href="https://github.com/Dominic62q"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="eyebrow link-u hidden hover:!text-signal sm:inline"
+        >
+          All on GitHub ↗
+        </a>
+      }
+    >
+      <div className="grid gap-x-16 lg:grid-cols-12">
+        <ul className="lg:col-span-7" aria-label="Projects">
+          {projects.map((project, i) => {
+            const isActive = isDesktop && project.id === activeId
+            return (
+              <Reveal as="li" key={project.id} delay={Math.min(i, 5) * 0.04} y={20} className="group/row relative isolate -mx-3 border-b border-rule px-3 first:border-t">
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-0 -z-10 origin-bottom bg-paper-deep transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover/row:scale-y-100 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => select(project.id)}
+                  onMouseEnter={() => isDesktop && setActiveId(project.id)}
+                  onFocus={() => isDesktop && setActiveId(project.id)}
+                  {...(isDesktop
+                    ? { 'aria-expanded': isActive, 'aria-controls': 'project-details' }
+                    : { 'aria-haspopup': 'dialog' })}
+                  className="group grid w-full grid-cols-[1.75rem_1fr_auto] items-baseline gap-x-3 py-6 text-left md:py-7"
+                >
+                  <span className={`eyebrow transition-colors duration-300 ${isActive ? '!text-signal' : ''}`}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+
+                  <span className="min-w-0">
+                    <span
+                      className={`display block text-[clamp(1.85rem,3.3vw,3rem)] leading-[1.02] transition-[transform,color] duration-500 ease-[var(--ease-out-expo)] ${
+                        isActive ? 'translate-x-2 text-signal' : 'group-hover:translate-x-2'
+                      }`}
+                    >
+                      {project.title}
+                    </span>
+                    <span className="eyebrow mt-2.5 block truncate !normal-case !tracking-[0.04em]">
+                      {project.stack.slice(0, 3).join(' · ')}
+                    </span>
+                  </span>
+
+                  <span
+                    aria-hidden="true"
+                    className={`font-mono text-lg transition-transform duration-500 ${isActive ? 'rotate-45 text-signal' : 'text-mute'}`}
+                  >
+                    +
+                  </span>
+                </button>
+              </Reveal>
+            )
+          })}
+        </ul>
+
+        {/* Desktop: sticky case-study panel. */}
+        <aside id="project-details" className="relative hidden lg:col-span-5 lg:block" aria-label="Project details">
+          <div className="sticky top-24">
+            <div className="relative mb-3 h-[2px] bg-rule" aria-hidden="true">
+              <motion.span
+                className="absolute inset-y-0 left-0 w-full origin-left bg-signal"
+                animate={{ scaleX: (projects.findIndex((p) => p.id === active.id) + 1) / projects.length }}
+                transition={{ duration: 0.8, ease: EASE }}
+              />
+            </div>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={active.id}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4, ease: EASE }}
+                className="rounded-sm border border-rule bg-paper-deep/60 p-8"
               >
-                Browse GitHub ↗
-              </a>
-            </div>
-
-            <div className="divide-y divide-border rounded-2xl border border-border">
-              {otherProjects.map((project) => (
-                <article key={project.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-sm font-semibold text-foreground">{project.title}</h3>
-                      {project.staging && (
-                        <Badge variant="outline" className="border-brand/20 bg-brand/10 font-mono text-[10px] text-brand/70 hover:bg-brand/10">
-                          staging
-                        </Badge>
-                      )}
-                      {project.contributor && (
-                        <Badge variant="outline" className="border-border font-mono text-[10px] text-muted-foreground">
-                          contributor
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="mt-1 truncate text-xs text-muted-foreground">{project.stack.slice(0, 4).join(' · ')}</p>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-4 text-xs text-muted-foreground/70">
-                    {project.github && (
-                      <a href={project.github} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center transition-colors hover:text-brand">
-                        GitHub ↗
-                      </a>
-                    )}
-                    {project.demo && (
-                      <a href={project.demo} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center transition-colors hover:text-brand">
-                        {project.staging ? 'Staging' : 'Live'} ↗
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
+                <p className="eyebrow mb-5 flex items-center justify-between">
+                  <span>
+                    Case {String(projects.findIndex((p) => p.id === active.id) + 1).padStart(2, '0')} /{' '}
+                    {String(projects.length).padStart(2, '0')}
+                  </span>
+                  <span className="text-signal">{active.title}</span>
+                </p>
+                <Detail project={active} />
+              </motion.div>
+            </AnimatePresence>
           </div>
-        )}
+        </aside>
       </div>
-    </section>
+
+      <AnimatePresence>
+        {sheetIndex >= 0 && (
+          <ProjectSheet
+            project={projects[sheetIndex]}
+            index={sheetIndex}
+            total={projects.length}
+            onClose={() => setSheetId(null)}
+            onStep={stepSheet}
+          />
+        )}
+      </AnimatePresence>
+    </Section>
   )
 }

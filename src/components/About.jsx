@@ -1,94 +1,75 @@
-import { motion } from 'framer-motion'
+import Reveal from './Reveal'
+import ScrollWords from './ScrollWords'
+import Section from './Section'
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+const certifications = [
+  'ALX Software Engineering Program: Python Backend Development',
+  'ALX Cybersecurity Program',
+  'ALX Professional Foundations',
+]
+
+const languages = [
+  { lang: 'English', level: 'Expert' },
+  { lang: 'Twi', level: 'Expert' },
+  { lang: 'French', level: 'Intermediate' },
+]
+
+function Fact({ label, children }) {
+  return (
+    <div className="grid grid-cols-[7.5rem_1fr] gap-4 border-t border-rule py-5">
+      <dt className="eyebrow pt-1">{label}</dt>
+      <dd className="text-[15px] leading-relaxed">{children}</dd>
+    </div>
+  )
 }
 
 export default function About() {
   return (
-    <section id="about" className="py-28 border-t border-border">
-      <div className="max-w-4xl mx-auto px-6">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={fadeUp}
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-xs font-mono text-brand">01</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">About</span>
-          </div>
+    <Section id="about" index="01" label="About">
+      <ScrollWords
+        id="about-heading"
+        text="I'm a software developer in Accra, building *backend-focused* full-stack products, internal tools, and healthcare and operations systems."
+        className="font-serif text-[clamp(2rem,4.6vw,4.5rem)] leading-[1.06] tracking-[-0.02em] md:max-w-[22ch] lg:max-w-[26ch]"
+      />
 
-          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight mb-10">
-            Building backend systems
-            <br className="hidden md:block" />
-            <span className="text-brand"> that actually work.</span>
-          </h2>
+      <div className="mt-16 grid gap-14 md:mt-24 lg:grid-cols-12 lg:gap-20">
+        <Reveal className="space-y-6 text-[17px] leading-[1.7] text-mute lg:col-span-6">
+          <p>
+            My work spans Django and Django REST Framework, Node.js, React, PostgreSQL, authentication, RBAC, API
+            integration, debugging, and deployment support. A cybersecurity background shapes how I think about
+            access control, data privacy, and reliability.
+          </p>
+          <p>
+            Recent work includes hospital inventory and ordering workflows, AssetTrack Pro, open-source mapping
+            tooling, and MarianSave, an offline-first desktop finance tracker.
+          </p>
+        </Reveal>
 
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-4 text-muted-foreground text-base leading-relaxed">
-              <p>
-                I'm a Software Developer at Rigelis Inc. based in Accra, Ghana,
-                building backend-focused full-stack products, internal tools,
-                and healthcare and operations systems.
-              </p>
-              <p>
-                My work spans Django and Django REST Framework, Node.js, React,
-                PostgreSQL, authentication, RBAC, API integration, debugging,
-                and deployment support. A cybersecurity background shapes how I
-                think about access control, data privacy, and reliability.
-              </p>
-              <p>
-                Recent work includes hospital inventory and ordering workflows,
-                AssetTrack Pro, open-source mapping tooling, and MarianSave, an
-                offline-first desktop finance tracker.
-              </p>
-            </div>
-
-            <div className="space-y-7">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60 mb-3">Education</p>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">BSc Biological Sciences (Biochemistry &amp; Plant Biology)</p>
-                  <p className="text-sm text-muted-foreground">University of Ghana · 2021 - 2024</p>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60 mb-3">Certifications</p>
-                <ul className="space-y-2">
-                  {[
-                    'ALX Software Engineering Program - Python Backend Development',
-                    'ALX Cybersecurity Program',
-                    'ALX Professional Foundations',
-                  ].map((cert) => (
-                    <li key={cert} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <span className="text-brand mt-0.5 shrink-0">-</span>
-                      {cert}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/60 mb-3">Languages</p>
-                <div className="flex flex-wrap gap-3">
-                  {[
-                    { lang: 'English', level: 'Expert' },
-                    { lang: 'Twi', level: 'Expert' },
-                    { lang: 'French', level: 'Intermediate' },
-                  ].map(({ lang, level }) => (
-                    <span key={lang} className="text-sm text-muted-foreground">
-                      {lang} <span className="text-muted-foreground/50 text-xs">({level})</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <Reveal delay={0.1} className="lg:col-span-6">
+          <dl className="border-b border-rule">
+            <Fact label="Education">
+              <p className="font-medium">BSc Biological Sciences (Biochemistry &amp; Plant Biology)</p>
+              <p className="text-mute">University of Ghana · 2021 – 2024</p>
+            </Fact>
+            <Fact label="Certified">
+              <ul className="space-y-1.5">
+                {certifications.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            </Fact>
+            <Fact label="Languages">
+              <ul className="flex flex-wrap gap-x-6 gap-y-1">
+                {languages.map(({ lang, level }) => (
+                  <li key={lang}>
+                    {lang} <span className="text-mute">({level})</span>
+                  </li>
+                ))}
+              </ul>
+            </Fact>
+          </dl>
+        </Reveal>
       </div>
-    </section>
+    </Section>
   )
 }

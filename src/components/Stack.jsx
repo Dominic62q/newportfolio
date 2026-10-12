@@ -1,124 +1,150 @@
-import { lazy, Suspense, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Compass, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import Section from './Section'
 import { TechLogo } from './TechLogo'
 import { stackGroups } from '../data/stack'
-import { useModalA11y } from '../lib/useModalA11y'
 
-// The graph ships as its own chunk; mobile only pays for it after tapping
-// "Explore my stack map".
-const StackConstellation = lazy(() => import('./StackConstellation'))
+const listVariants = { hidden: {}, show: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } } }
 
-function ConstellationSkeleton() {
+function ArrowButton({ direction, disabled, onClick }) {
+  const Icon = direction === 'prev' ? ArrowLeft : ArrowRight
   return (
-    <div
-      className="w-full animate-pulse rounded-2xl border border-border bg-muted/30"
-      style={{ aspectRatio: '16 / 10' }}
-    />
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={direction === 'prev' ? 'Previous categories' : 'Next categories'}
+      className="inline-flex size-10 items-center justify-center rounded-full border border-rule text-ink transition-colors hover:border-ink hover:bg-ink hover:text-paper disabled:pointer-events-none disabled:opacity-30"
+    >
+      <Icon className="size-4" aria-hidden="true" />
+    </button>
   )
 }
 
+// The stack is one horizontal strip of category panels (native scroll-snap, so
+// swipe, trackpad, keyboard and drag all work) instead of a tall grid.
 export default function Stack() {
-  const [mapOpen, setMapOpen] = useState(false)
-  const dialogRef = useRef(null)
-  const closeBtnRef = useRef(null)
-  useModalA11y(mapOpen, dialogRef, closeBtnRef)
+  const scrollerRef = useRef(null)
+  const barRef = useRef(null)
+  const drag = useRef(null)
+  const [dragging, setDragging] = useState(false)
+  const [edge, setEdge] = useState({ start: true, end: false })
+
+  const sync = useCallback(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    const max = el.scrollWidth - el.clientWidth
+    const progress = max > 0 ? el.scrollLeft / max : 0
+    if (barRef.current) {
+      const visible = max > 0 ? el.clientWidth / el.scrollWidth : 1
+      barRef.current.style.width = `${visible * 100}%`
+      barRef.current.style.transform = `translateX(${progress * (1 / visible - 1) * 100}%)`
+    }
+    setEdge((prev) => {
+      const next = { start: el.scrollLeft < 4, end: el.scrollLeft > max - 4 }
+      return prev.start === next.start && prev.end === next.end ? prev : next
+    })
+  }, [])
+
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return undefined
+    sync()
+    const observer = new ResizeObserver(sync)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [sync])
+
+  const step = (dir) => {
+    const el = scrollerRef.current
+    const panel = el?.querySelector('[data-panel]')
+    if (!el || !panel) return
+    el.scrollBy({ left: dir * (panel.offsetWidth + 32), behavior: 'smooth' })
+  }
+
+  // Mouse drag-to-scroll (touch and trackpads already scroll natively).
+  const onPointerDown = (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return
+    const el = scrollerRef.current
+    drag.current = { x: e.clientX, left: el.scrollLeft, moved: false }
+  }
+  const onPointerMove = (e) => {
+    const d = drag.current
+    if (!d) return
+    const dx = e.clientX - d.x
+    if (!d.moved && Math.abs(dx) > 4) {
+      d.moved = true
+      setDragging(true)
+    }
+    if (d.moved) scrollerRef.current.scrollLeft = d.left - dx
+  }
+  const endDrag = () => {
+    drag.current = null
+    setDragging(false)
+  }
 
   return (
-    <section id="stack" className="py-28 border-t border-border">
-      <div className="max-w-4xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-          className="mb-14"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono text-brand">03</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Stack</span>
-          </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
-            Tools I work with.
-          </h2>
-          <p className="mt-4 max-w-xl text-sm text-muted-foreground">
-            Hover a logo for its brand colour, move your cursor to sweep the light across the dark.
-          </p>
-        </motion.div>
-
-        {/* Desktop: live tool constellation built from real project co-deployments */}
-        <div className="hidden md:block">
-          <Suspense fallback={<ConstellationSkeleton />}>
-            <StackConstellation />
-          </Suspense>
+    <Section
+      id="stack"
+      index="03"
+      label="Stack"
+      title="Tools of the *trade.*"
+      aside={
+        <div className="hidden items-center gap-2 sm:flex">
+          <ArrowButton direction="prev" disabled={edge.start} onClick={() => step(-1)} />
+          <ArrowButton direction="next" disabled={edge.end} onClick={() => step(1)} />
         </div>
-
-        {/* Mobile: compact chip grid + fullscreen map on demand */}
-        <div className="md:hidden">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.4 }}
-            className="space-y-8"
-          >
-            {stackGroups.map(({ category, items }) => (
-              <div key={category}>
-                <p className="mb-3 text-[10px] font-mono uppercase tracking-widest text-brand/70">{category}</p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {items.map((item) => (
-                    <TechLogo key={item} name={item} variant="tile" />
-                  ))}
-                </div>
+      }
+    >
+      <div className="-mx-6 md:-mx-10">
+        <div
+          ref={scrollerRef}
+          onScroll={sync}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={endDrag}
+          onPointerLeave={endDrag}
+          onPointerCancel={endDrag}
+          role="region"
+          aria-label="Technology stack by category"
+          tabIndex={0}
+          className={`flex scroll-px-6 gap-8 overflow-x-auto overscroll-x-contain px-6 pb-2 [scrollbar-width:none] md:scroll-px-10 md:px-10 [&::-webkit-scrollbar]:hidden ${
+            dragging ? 'cursor-grabbing select-none' : 'snap-x snap-mandatory md:cursor-grab'
+          }`}
+        >
+          {stackGroups.map(({ category, items }, i) => (
+            <div
+              key={category}
+              data-panel
+              className="w-[74vw] max-w-[22rem] shrink-0 snap-start sm:w-[22rem] lg:w-[24rem]"
+            >
+              <div className="flex items-baseline justify-between border-b border-ink pb-3">
+                <h3 className="eyebrow !text-ink">{category}</h3>
+                <span className="font-serif text-3xl italic leading-none text-signal">{String(i + 1).padStart(2, '0')}</span>
               </div>
-            ))}
-          </motion.div>
-
-          <button
-            type="button"
-            onClick={() => setMapOpen(true)}
-            className="mt-10 flex w-full items-center justify-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-5 py-3.5 text-sm font-semibold text-brand transition-colors hover:bg-brand/15"
-          >
-            <Compass className="size-4" aria-hidden="true" />
-            Explore my stack map
-          </button>
-          <p className="mt-3 text-center text-xs text-muted-foreground/60">
-            See how every tool connects through real shipped projects.
-          </p>
+              <motion.ul
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: '-40px' }}
+                variants={listVariants}
+              >
+                {items.map((item) => (
+                  <TechLogo key={item} name={item} variant="row" />
+                ))}
+              </motion.ul>
+            </div>
+          ))}
+          <div aria-hidden="true" className="w-2 shrink-0 md:w-10" />
         </div>
       </div>
 
-      {/* Fullscreen stack map overlay */}
-      {mapOpen && (
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Interactive stack map"
-          className="fixed inset-0 z-[150] flex flex-col bg-background"
-        >
-          <div className="flex shrink-0 items-center justify-between px-4 py-3">
-            <div>
-              <p className="font-display text-base font-extrabold leading-tight">My stack, connected</p>
-              <p className="text-[11px] text-muted-foreground">Tap any tool to trace where it shipped.</p>
-            </div>
-            <button
-              ref={closeBtnRef}
-              type="button"
-              onClick={() => setMapOpen(false)}
-              aria-label="Close stack map"
-              className="inline-flex size-11 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-brand hover:text-brand"
-            >
-              <X className="size-5" aria-hidden="true" />
-            </button>
-          </div>
-          <div className="min-h-0 flex-1 px-3 pb-3">
-            <Suspense fallback={<div className="h-full w-full animate-pulse rounded-2xl bg-muted/30" />}>
-              <StackConstellation variant="overlay" onClose={() => setMapOpen(false)} />
-            </Suspense>
-          </div>
+      <div className="mt-10 flex items-center gap-6">
+        <div className="relative h-px flex-1 bg-rule" aria-hidden="true">
+          <div ref={barRef} className="absolute -top-px left-0 h-[3px] bg-ink" style={{ width: '40%' }} />
         </div>
-      )}
-    </section>
+        <span className="eyebrow hidden shrink-0 sm:inline">Drag or scroll →</span>
+      </div>
+    </Section>
   )
 }
