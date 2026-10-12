@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { Card, CardContent } from '@/components/ui/card'
+import Reveal from './Reveal'
+import Section from './Section'
 
 const strengths = [
   {
@@ -34,52 +34,53 @@ const strengths = [
   },
 ]
 
-export default function Strengths() {
-  return (
-    <section id="strengths" className="py-28 border-t border-border">
-      <div className="max-w-3xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.5 }}
-          className="mb-14"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono text-brand">05</span>
-            <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground/60">Capabilities</span>
-          </div>
-          <h2 className="font-display font-black text-4xl md:text-5xl text-foreground leading-[1.05] tracking-tight">
-            What I do well.
-          </h2>
-        </motion.div>
+const numerals = ['i', 'ii', 'iii', 'iv', 'v', 'vi']
 
-        <div className="grid gap-5 md:grid-cols-2">
-          {strengths.map((s, i) => (
-            <motion.div
-              key={s.title}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.4, delay: i * 0.06 }}
-            >
-              <Card className="group h-full border-border bg-card shadow-none transition-colors hover:border-brand/40">
-                <CardContent className="px-(--card-spacing) py-5">
-                  <div className="mb-3 flex items-start gap-3">
-                    <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full border border-border bg-card transition-colors group-hover:border-brand group-hover:bg-brand" />
-                    <h3 className="text-sm font-semibold text-foreground transition-colors group-hover:text-brand">
-                      {s.title}
-                    </h3>
-                  </div>
-                  <p className="pl-[22px] text-sm leading-relaxed text-muted-foreground">
-                    {s.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+// The same content is drawn twice: ink on paper below, paper on ink above. The top
+// layer is revealed by a circle that grows from wherever the pointer entered.
+function CardFace({ item, numeral, inverted }) {
+  return (
+    <div className={`p-8 md:p-10 ${inverted ? 'bg-ink text-paper' : ''}`}>
+      <span className={`font-serif text-4xl italic leading-none ${inverted ? 'text-paper' : 'text-signal'}`}>{numeral}.</span>
+      <h3 className="display mt-14 text-[clamp(1.75rem,2.4vw,2.35rem)] md:mt-20">{item.title}</h3>
+      <p className={`mt-4 text-[15px] leading-[1.65] ${inverted ? 'text-paper/75' : 'text-mute'}`}>{item.description}</p>
+    </div>
+  )
+}
+
+function Capability({ item, numeral, index }) {
+  const setOrigin = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    e.currentTarget.style.setProperty('--x', `${e.clientX - rect.left}px`)
+    e.currentTarget.style.setProperty('--y', `${e.clientY - rect.top}px`)
+  }
+  return (
+    <Reveal delay={(index % 3) * 0.07} y={22} className="-ml-px border-b border-r border-t border-rule">
+      <div
+        onPointerEnter={setOrigin}
+        onPointerLeave={setOrigin}
+        className="group relative overflow-hidden [--x:50%] [--y:50%]"
+      >
+        <CardFace item={item} numeral={numeral} />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 [clip-path:circle(0px_at_var(--x)_var(--y))] transition-[clip-path] duration-[800ms] ease-[var(--ease-out-expo)] group-hover:[clip-path:circle(160%_at_var(--x)_var(--y))]"
+        >
+          <CardFace item={item} numeral={numeral} inverted />
         </div>
       </div>
-    </section>
+    </Reveal>
+  )
+}
+
+export default function Strengths() {
+  return (
+    <Section id="strengths" index="05" label="Capabilities" title="What I do *well.*">
+      <div className="grid border-l border-rule sm:grid-cols-2 lg:grid-cols-3">
+        {strengths.map((s, i) => (
+          <Capability key={s.title} item={s} numeral={numerals[i]} index={i} />
+        ))}
+      </div>
+    </Section>
   )
 }

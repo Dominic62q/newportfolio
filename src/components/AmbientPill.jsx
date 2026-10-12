@@ -1,17 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  Cloud,
-  CloudFog,
-  CloudLightning,
-  CloudRain,
-  CloudSun,
-  ExternalLink,
-  GitCommit,
-  Music2,
-  Sun,
-} from 'lucide-react'
+import { ExternalLink, GitCommit, Music2 } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { useUI } from '../context/useUI'
+import { describeWeather, timeAgo } from '../lib/ambient'
+import MobileIsland from './MobileIsland'
+import WeatherGlyph from './WeatherGlyph'
 
 const MUSIC_REFRESH_INTERVAL = 5_000
 const WEATHER_REFRESH_INTERVAL = 10 * 60_000
@@ -20,16 +12,6 @@ const WEATHER_URL =
   'https://api.open-meteo.com/v1/forecast?latitude=5.6037&longitude=-0.1870&current=temperature_2m,apparent_temperature,weather_code&timezone=Africa%2FAccra'
 const GITHUB_EVENTS_URL =
   'https://api.github.com/users/Dominic62q/events/public?per_page=100'
-
-function timeAgo(dateString) {
-  const elapsedMs = Date.now() - new Date(dateString).getTime()
-  const minutes = Math.floor(elapsedMs / 60_000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
-}
 
 function latestCommitsFromEvents(events) {
   const pushes = events.filter((event) => event.type === 'PushEvent')
@@ -47,22 +29,20 @@ function latestCommitsFromEvents(events) {
   return commits.slice(0, 5)
 }
 
-function Equalizer({ muted = false, boosted = false }) {
-  const animationStyle = boosted ? { animationDuration: '0.28s' } : undefined
-
+function Equalizer({ muted = false }) {
   return (
     <span className={`flex items-end gap-0.5 ${muted ? 'opacity-40' : ''}`} aria-hidden="true">
-      <span className="h-1.5 w-0.5 animate-pulse rounded-full bg-brand" style={animationStyle} />
-      <span className="h-3 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:120ms]" style={animationStyle} />
-      <span className="h-2 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:240ms]" style={animationStyle} />
-      <span className="h-2.5 w-0.5 animate-pulse rounded-full bg-brand [animation-delay:360ms]" style={animationStyle} />
+      <span className="h-1.5 w-0.5 animate-pulse rounded-full bg-signal" />
+      <span className="h-3 w-0.5 animate-pulse rounded-full bg-signal [animation-delay:120ms]" />
+      <span className="h-2 w-0.5 animate-pulse rounded-full bg-signal [animation-delay:240ms]" />
+      <span className="h-2.5 w-0.5 animate-pulse rounded-full bg-signal [animation-delay:360ms]" />
     </span>
   )
 }
 
 function PillShell({ children }) {
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-[4.5rem] z-40 flex justify-center px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 hidden justify-start px-4 sm:flex md:px-10">
       <div className="pointer-events-auto w-fit max-w-full">
         {children}
       </div>
@@ -72,7 +52,7 @@ function PillShell({ children }) {
 
 function AlbumArt({ imageUrl }) {
   return (
-    <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-800 text-brand ring-1 ring-border">
+    <div className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-paper-deep text-signal ring-1 ring-rule">
       {imageUrl ? (
         <img src={imageUrl} alt="" className="size-full object-cover" />
       ) : (
@@ -80,30 +60,6 @@ function AlbumArt({ imageUrl }) {
       )}
     </div>
   )
-}
-
-function WeatherIcon({ code }) {
-  let Icon = Cloud
-
-  if (code === 0) Icon = Sun
-  else if ([1, 2].includes(code)) Icon = CloudSun
-  else if ([45, 48].includes(code)) Icon = CloudFog
-  else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86].includes(code)) Icon = CloudRain
-  else if ([95, 96, 99].includes(code)) Icon = CloudLightning
-
-  return <Icon className="size-4 shrink-0 text-brand" aria-hidden="true" />
-}
-
-function describeWeather(code) {
-  if (code === 0) return 'Clear'
-  if ([1, 2].includes(code)) return 'Partly cloudy'
-  if (code === 3) return 'Overcast'
-  if ([45, 48].includes(code)) return 'Foggy'
-  if ([51, 53, 55, 56, 57].includes(code)) return 'Drizzle'
-  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'Rain'
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'Snow'
-  if ([95, 96, 99].includes(code)) return 'Thunderstorms'
-  return 'Current conditions'
 }
 
 function Slide({ children, panel, reducedMotion }) {
@@ -122,13 +78,13 @@ function Slide({ children, panel, reducedMotion }) {
   )
 }
 
-function MusicPanel({ track, progressPercent, loading, boosted }) {
+function MusicPanel({ track, progressPercent, loading }) {
   if (loading) {
     return (
-      <div className="flex min-h-11 items-center gap-2.5 rounded-full border border-border bg-background/95 px-3 shadow-lg shadow-black/5 backdrop-blur-md">
-        <div className="size-7 shrink-0 animate-pulse rounded-full bg-muted" />
-        <div className="h-2.5 w-32 animate-pulse rounded-full bg-muted" />
-        <span className="ml-auto size-1.5 animate-pulse rounded-full bg-muted" />
+      <div className="flex min-h-11 items-center gap-2.5 rounded-full border border-rule bg-paper/85 px-3.5 backdrop-blur-xl">
+        <div className="size-7 shrink-0 animate-pulse rounded-full bg-rule" />
+        <div className="h-2.5 w-32 animate-pulse rounded-full bg-rule" />
+        <span className="ml-auto size-1.5 animate-pulse rounded-full bg-rule" />
       </div>
     )
   }
@@ -136,16 +92,16 @@ function MusicPanel({ track, progressPercent, loading, boosted }) {
   if (!track) {
     return (
       <div
-        className="flex min-h-11 items-center justify-between gap-3 rounded-full border border-border bg-background/95 px-3 shadow-lg shadow-black/5 backdrop-blur-md"
+        className="flex min-h-11 items-center justify-between gap-3 rounded-full border border-rule bg-paper/85 px-3.5 backdrop-blur-xl"
         role="group"
         aria-label="Spotify is offline"
       >
-        <span className="flex min-w-0 items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          <Equalizer muted boosted={boosted} />
+        <span className="flex min-w-0 items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-mute">
+          <Equalizer muted />
           <span className="truncate">Dominic&apos;s soundtrack</span>
         </span>
-        <span className="flex shrink-0 items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-muted-foreground/70">
-          <span className="size-1.5 rounded-full bg-muted-foreground/50" />
+        <span className="flex shrink-0 items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-mute">
+          <span className="size-1.5 rounded-full bg-mute/50" />
           Offline
         </span>
       </div>
@@ -158,34 +114,34 @@ function MusicPanel({ track, progressPercent, loading, boosted }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Currently listening to ${track.name} by ${track.artist} on Spotify`}
-      className="group relative flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 overflow-hidden rounded-full border border-brand/30 bg-background/95 px-2.5 pr-3.5 shadow-lg shadow-brand/10 backdrop-blur-md transition-colors hover:border-brand/70"
+      className="group relative flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 overflow-hidden rounded-full border border-signal/40 bg-paper/85 px-2.5 pr-3.5 backdrop-blur-xl transition-colors hover:border-signal"
     >
       <AlbumArt imageUrl={track.imageUrl} />
       <span className="hidden items-center sm:inline-flex">
-        <Equalizer boosted={boosted} />
+        <Equalizer />
       </span>
 
       <span className="flex min-w-0 max-w-[18rem] items-center gap-1.5 text-left">
-        <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-brand">
+        <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-signal">
           Now playing
         </span>
-        <span className="min-w-0 truncate text-xs font-semibold text-foreground">
+        <span className="min-w-0 truncate text-xs font-semibold text-ink">
           {track.name}
         </span>
-        <span className="hidden max-w-40 truncate text-xs text-muted-foreground sm:inline">
+        <span className="hidden max-w-40 truncate text-xs text-mute sm:inline">
           · {track.artist}
         </span>
       </span>
 
-      <span className="flex shrink-0 items-center gap-2 text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground transition-colors group-hover:text-foreground">
+      <span className="flex shrink-0 items-center gap-2 text-[10px] font-medium uppercase tracking-[0.1em] text-mute transition-colors group-hover:text-ink">
         <span className="hidden sm:inline">Spotify</span>
-        <ExternalLink className="size-3.5 text-brand" aria-hidden="true" />
+        <ExternalLink className="size-3.5 text-signal" aria-hidden="true" />
       </span>
 
       {track.durationMs ? (
-        <span className="absolute inset-x-4 bottom-0 h-0.5 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+        <span className="absolute inset-x-4 bottom-0 h-0.5 overflow-hidden rounded-full bg-rule" aria-hidden="true">
           <motion.span
-            className="block h-full rounded-full bg-brand"
+            className="block h-full rounded-full bg-signal"
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.6, ease: 'linear' }}
           />
@@ -198,15 +154,15 @@ function MusicPanel({ track, progressPercent, loading, boosted }) {
 function WeatherPanel({ weather }) {
   return (
     <div
-      className="flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 rounded-full border border-border bg-background/95 px-3.5 shadow-lg shadow-black/5 backdrop-blur-md"
+      className="flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 rounded-full border border-rule bg-paper/85 px-3.5 backdrop-blur-xl"
       role="group"
       aria-label={`Current weather in Accra: ${Math.round(weather.temperature)} degrees Celsius, ${describeWeather(weather.code)}`}
     >
-      <WeatherIcon code={weather.code} />
-      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Accra</span>
-      <span className="text-sm font-semibold tabular-nums text-foreground">{Math.round(weather.temperature)}°C</span>
-      <span className="hidden text-xs text-muted-foreground sm:inline">{describeWeather(weather.code)}</span>
-      <span className="hidden text-xs text-muted-foreground/70 sm:inline">Feels {Math.round(weather.apparentTemperature)}°</span>
+      <WeatherGlyph code={weather.code} className="size-4 shrink-0 text-signal" />
+      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-mute">Accra</span>
+      <span className="text-sm font-semibold tabular-nums text-ink">{Math.round(weather.temperature)}°C</span>
+      <span className="hidden text-xs text-mute sm:inline">{describeWeather(weather.code)}</span>
+      <span className="hidden text-xs text-mute sm:inline">Feels {Math.round(weather.apparentTemperature)}°</span>
     </div>
   )
 }
@@ -226,17 +182,17 @@ function CommitsPanel({ commit }) {
           ? `Latest commit: ${commit.message} in ${commit.repo}, ${metadata}`
           : 'GitHub profile: building and shipping on GitHub'
       }
-      className="group flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 rounded-full border border-border bg-background/95 px-3 shadow-lg shadow-black/5 backdrop-blur-md transition-colors hover:border-brand/70"
+      className="group flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2.5 rounded-full border border-rule bg-paper/85 px-3.5 backdrop-blur-xl transition-colors hover:border-signal"
     >
-      <GitCommit className="size-4 shrink-0 text-brand" aria-hidden="true" />
+      <GitCommit className="size-4 shrink-0 text-signal" aria-hidden="true" />
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-brand">
+        <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-signal">
           Shipping
         </span>
-        <span className="min-w-0 truncate text-xs font-semibold text-foreground">
+        <span className="min-w-0 truncate text-xs font-semibold text-ink">
           {message}
         </span>
-        <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+        <span className="hidden shrink-0 text-xs text-mute sm:inline">
           · {metadata}
         </span>
       </span>
@@ -253,7 +209,6 @@ export default function AmbientPill() {
   const [panel, setPanel] = useState('music')
   const tickRef = useRef(null)
   const reducedMotion = useReducedMotion()
-  const { ambientBoosted } = useUI()
 
   const loadTrack = useCallback(async () => {
     try {
@@ -374,7 +329,16 @@ export default function AmbientPill() {
   const visiblePanel = rotation.includes(panel) ? panel : 'music'
 
   return (
-    <PillShell>
+    <>
+      <MobileIsland
+        track={track}
+        progressPercent={progressPercent}
+        elapsedMs={elapsedMs}
+        loading={musicLoading}
+        weather={weather}
+        commit={latestCommit}
+      />
+      <PillShell>
       <AnimatePresence initial={false} mode="wait">
         {visiblePanel === 'weather' && weather ? (
           <Slide key="weather" panel="weather" reducedMotion={reducedMotion}>
@@ -390,11 +354,11 @@ export default function AmbientPill() {
               track={track}
               progressPercent={progressPercent}
               loading={musicLoading}
-              boosted={ambientBoosted}
             />
           </Slide>
         )}
       </AnimatePresence>
-    </PillShell>
+      </PillShell>
+    </>
   )
 }

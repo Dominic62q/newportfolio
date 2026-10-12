@@ -49,6 +49,7 @@ const KEY_TO_TECH = {
 
 // Map messy data labels onto the keys above.
 const ALIAS = {
+  'node.js': 'node',
   'django rest framework': 'django',
   'django drf': 'django',
   'django templates': 'django',

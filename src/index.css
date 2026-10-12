@@ -1,71 +1,218 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&display=swap');
+@import "@fontsource/instrument-serif/latin-400.css";
+@import "@fontsource/instrument-serif/latin-400-italic.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
 
 @variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Design tokens — "Field Notes": warm paper, ink, one cobalt signal.
+   --------------------------------------------------------------------------- */
+:root {
+  --paper: oklch(0.965 0.013 85);
+  --paper-deep: oklch(0.935 0.016 85);
+  --ink: oklch(0.17 0.012 70);
+  --mute: oklch(0.43 0.014 75);
+  --rule: oklch(0.17 0.012 70 / 0.16);
+  --signal: oklch(0.47 0.25 268);
+  --signal-ink: oklch(0.985 0.01 85);
+  --highlight: oklch(0.9 0.14 100);
+
+  /* shadcn semantic tokens, mapped onto the palette */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--mute);
+  --accent: var(--paper-deep);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.55 0.2 27);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--signal);
+  --radius: 0.25rem;
+}
+
+.dark {
+  --paper: oklch(0.155 0.009 70);
+  --paper-deep: oklch(0.2 0.01 70);
+  --ink: oklch(0.955 0.014 85);
+  --mute: oklch(0.72 0.012 80);
+  --rule: oklch(0.955 0.014 85 / 0.16);
+  --signal: oklch(0.74 0.16 268);
+  --signal-ink: oklch(0.155 0.009 70);
+  --highlight: oklch(0.45 0.09 100);
+  --destructive: oklch(0.7 0.18 25);
+}
+
+@theme inline {
+  --font-serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-heading: var(--font-sans);
+
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-mute: var(--mute);
+  --color-rule: var(--rule);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-highlight: var(--highlight);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  ::selection {
-    background-color: var(--color-brand);
-    color: white;
-  }
-
-  ::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: hsl(0 0% 82%);
-    border-radius: 99px;
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    background-color: hsl(0 0% 22%);
+    @apply bg-paper text-ink font-sans;
+    font-feature-settings: 'ss01', 'cv11';
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
   * {
-    @apply border-border outline-ring/50;
+    @apply border-rule;
   }
 
-  [data-slot="card"] {
-    box-shadow: none !important;
+  ::selection {
+    background-color: var(--signal);
+    color: var(--signal-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--rule);
+    border-radius: 99px;
+  }
+
+  /* Paper grain: a single static noise tile, painted once. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0.055;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .dark body::after {
+    opacity: 0.09;
+    mix-blend-mode: screen;
+    filter: invert(1);
   }
 }
 
 @layer components {
-  .font-display {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* Small mono caption used for indices, labels, meta rows. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--mute);
+  }
+
+  /* Display headings: Instrument Serif, tight, with italic as the accent. */
+  .display {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
+  }
+  .display em {
+    font-style: italic;
+    color: var(--signal);
+    letter-spacing: -0.02em;
+  }
+
+  /* Underline that draws in from the left on hover. */
+  .link-u {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    transition: background-size 0.45s var(--ease-out-expo), color 0.2s ease;
+  }
+  .link-u:hover {
+    background-size: 0 1px;
+    background-position: 100% 100%;
+  }
+
+  .container-x {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1320px;
+    padding-inline: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .container-x {
+      padding-inline: 2.5rem;
+    }
   }
 }
 
-@layer utilities {
-  .animate-marquee {
-    animation: marquee 30s linear infinite;
+@keyframes badge-spin {
+  to {
+    transform: rotate(360deg);
   }
-}
-
-@keyframes marquee {
-  from { transform: translateX(0) }
-  to   { transform: translateX(-33.333%) }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -83,156 +230,39 @@
   }
 }
 
-@theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Inter Variable', sans-serif;
-  --color-brand: #f97316;
-  --color-brand-foreground: #ffffff;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+/* Theme switch: the new theme is revealed by a circle (driven from ThemeContext). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
-
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+::view-transition-old(root) {
+  z-index: 1;
 }
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
-/* ---- Stack constellation -------------------------------------------------- */
-
-/* Starfield backdrop on the dark constellation board */
-.stack-stars {
-  background-image:
-    radial-gradient(1px 1px at 12% 22%, rgba(255, 255, 255, 0.35) 50%, transparent 50%),
-    radial-gradient(1px 1px at 34% 68%, rgba(255, 255, 255, 0.25) 50%, transparent 50%),
-    radial-gradient(1.5px 1.5px at 57% 15%, rgba(255, 255, 255, 0.3) 50%, transparent 50%),
-    radial-gradient(1px 1px at 73% 47%, rgba(255, 255, 255, 0.3) 50%, transparent 50%),
-    radial-gradient(1px 1px at 88% 79%, rgba(255, 255, 255, 0.25) 50%, transparent 50%),
-    radial-gradient(1.5px 1.5px at 46% 88%, rgba(255, 255, 255, 0.2) 50%, transparent 50%),
-    radial-gradient(1px 1px at 8% 85%, rgba(255, 255, 255, 0.2) 50%, transparent 50%);
-}
-
-/* Flashlight effect: tiles are dim and desaturated until the light reaches
-   them (class toggled from rAF in StackConstellation). Transition keeps the
-   reveal soft; gradient/opacity only, so it stays cheap. */
-.stack-tile {
-  filter: grayscale(0.75) brightness(0.7);
-  opacity: 0.45;
-  transition:
-    filter 0.35s ease,
-    opacity 0.35s ease,
-    transform 0.3s ease;
-}
-
-.stack-tile.is-lit {
-  filter: none;
-  opacity: 1;
+::view-transition-new(root) {
+  z-index: 2;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stack-tile {
-    /* no torch animation under reduced motion — keep everything readable */
-    filter: none;
-    opacity: 1;
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 
+/* Mobile island: title ticker and equalizer bars. */
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
