@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { MotionConfig } from 'framer-motion'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { ThemeProvider } from './context/ThemeContext'
 import { UIProvider } from './context/UIContext'
 import Navbar from './components/Navbar'
@@ -117,6 +119,8 @@ function App() {
           <Suspense fallback={null}>
             <CommandPalette />
           </Suspense>
+          <Analytics />
+          <SpeedInsights />
         </MotionConfig>
       </UIProvider>
     </ThemeProvider>
