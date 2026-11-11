@@ -25,15 +25,30 @@ function ScrollProgress() {
   const barRef = useRef(null)
   useEffect(() => {
     let ticking = false
+    let idle = 0
+    // Page height only changes on resize or content changes, so cache it
+    // instead of reading layout on every scroll frame.
+    let total = 0
+    const measure = () => {
+      total = document.documentElement.scrollHeight - window.innerHeight
+    }
+    measure()
+    const ro = new ResizeObserver(() => {
+      measure()
+      onScroll()
+    })
+    ro.observe(document.body)
     const update = () => {
       ticking = false
-      const total = document.documentElement.scrollHeight - window.innerHeight
       const pct = total > 0 ? window.scrollY / total : 0
       if (barRef.current) barRef.current.style.transform = `scaleX(${pct})`
     }
     // One update per animation frame, written straight to the DOM node, so
     // scrolling never triggers a React re-render.
     const onScroll = () => {
+      document.documentElement.classList.add('is-scrolling')
+      clearTimeout(idle)
+      idle = setTimeout(() => document.documentElement.classList.remove('is-scrolling'), 150)
       if (!ticking) {
         ticking = true
         requestAnimationFrame(update)
@@ -43,6 +58,8 @@ function ScrollProgress() {
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onScroll, { passive: true })
     return () => {
+      ro.disconnect()
+      clearTimeout(idle)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }

@@ -4,6 +4,7 @@ import {
   useAnimationFrame,
   useMotionValue,
   useReducedMotion,
+  useInView,
   useScroll,
   useSpring,
   useTransform,
@@ -38,6 +39,9 @@ function Copy() {
 // A giant serif band that drifts on its own, then surges and skews with your scroll speed.
 export default function VelocityMarquee() {
   const reduced = useReducedMotion()
+  const bandRef = useRef(null)
+  // Only run the per-frame drift while the band is on screen.
+  const inView = useInView(bandRef, { margin: '200px 0px' })
   const base = useMotionValue(0)
   const { scrollY } = useScroll()
   const velocity = useVelocity(scrollY)
@@ -48,7 +52,7 @@ export default function VelocityMarquee() {
   const x = useTransform(base, (v) => `${wrap(-25, 0, v)}%`)
 
   useAnimationFrame((_, delta) => {
-    if (reduced) return
+    if (reduced || !inView) return
     const b = boost.get()
     if (b < -0.02) direction.current = 1
     else if (b > 0.02) direction.current = -1
@@ -58,6 +62,7 @@ export default function VelocityMarquee() {
 
   return (
     <div
+      ref={bandRef}
       className="overflow-hidden border-t border-rule py-8 md:py-12"
       role="group"
       aria-label="Backend systems, REST APIs, full-stack products, healthcare and operations"

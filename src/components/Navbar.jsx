@@ -35,6 +35,7 @@ export default function Navbar() {
   const [active, setActive] = useState('')
   const [hidden, setHidden] = useState(false)
   const lastY = useRef(0)
+  const flags = useRef({ scrolled: null, hidden: false })
   const { setPaletteOpen } = useUI()
   const menuRef = useRef(null)
   const closeRef = useRef(null)
@@ -45,9 +46,18 @@ export default function Navbar() {
     // The bar tucks away while reading down and slides back the moment you scroll up.
     const onScroll = () => {
       const y = window.scrollY
-      setScrolled(y > 24)
+      // Only touch React state when a value actually flips.
+      const nextScrolled = y > 24
+      if (nextScrolled !== flags.current.scrolled) {
+        flags.current.scrolled = nextScrolled
+        setScrolled(nextScrolled)
+      }
       if (Math.abs(y - lastY.current) > 6) {
-        setHidden(y > 360 && y > lastY.current)
+        const nextHidden = y > 360 && y > lastY.current
+        if (nextHidden !== flags.current.hidden) {
+          flags.current.hidden = nextHidden
+          setHidden(nextHidden)
+        }
         lastY.current = y
       }
     }
@@ -95,9 +105,9 @@ export default function Navbar() {
     <>
       <header
         onFocusCapture={() => setHidden(false)}
-        className={`fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color,backdrop-filter] duration-500 ease-[var(--ease-out-expo)] ${
+        className={`fixed inset-x-0 top-0 z-50 transition-[transform,background-color,border-color] duration-500 ease-[var(--ease-out-expo)] ${
           hidden ? '-translate-y-full' : 'translate-y-0'
-        } ${scrolled ? 'border-b border-rule bg-paper/80 backdrop-blur-xl' : 'border-b border-transparent'}`}
+        } ${scrolled ? 'border-b border-rule bg-paper/90 backdrop-blur-md' : 'border-b border-transparent'}`}
       >
         <nav aria-label="Primary navigation" className="container-x flex h-16 items-center justify-between">
           <a
@@ -128,7 +138,7 @@ export default function Navbar() {
                       <RollText>{label}</RollText>
                       <span
                         aria-hidden="true"
-                        className={`absolute -bottom-px left-0 h-px bg-signal transition-all duration-500 ${isActive ? 'w-full' : 'w-0'}`}
+                        className={`absolute -bottom-px left-0 h-px w-full origin-left bg-signal transition-transform duration-500 ${isActive ? 'scale-x-100' : 'scale-x-0'}`}
                       />
                     </a>
                   </li>

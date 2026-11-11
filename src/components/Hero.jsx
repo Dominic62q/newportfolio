@@ -30,7 +30,8 @@ const letterRise = {
 function RotatingBadge() {
   return (
     <div className="relative size-28 shrink-0 md:size-36" aria-hidden="true">
-      <svg viewBox="0 0 120 120" className="absolute inset-0 size-full text-ink [animation:badge-spin_28s_linear_infinite]">
+      <div className="absolute inset-0 [animation:badge-spin_28s_linear_infinite]">
+      <svg viewBox="0 0 120 120" className="size-full text-ink">
         <defs>
           <path id="badge-circle" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0" />
         </defs>
@@ -38,6 +39,7 @@ function RotatingBadge() {
           <textPath href="#badge-circle">Open to work · Backend · Full-stack · APIs ·</textPath>
         </text>
       </svg>
+      </div>
       <span className="absolute inset-0 grid place-items-center">
         <span className="grid size-12 place-items-center rounded-full bg-signal text-xl text-signal-ink md:size-14">↘</span>
       </span>
@@ -57,14 +59,31 @@ function usePointerWave(sectionRef, lettersRef) {
     const letters = lettersRef.current
     let frame = 0
     let running = false
+    // Letter centres relative to the section. Measured once per interaction
+    // (and again after a scroll or resize) instead of on every frame, so the
+    // loop never forces a layout while the page is scrolling.
+    let centres = null
+    const measure = () => {
+      const s = section.getBoundingClientRect()
+      centres = letters.map((el) => {
+        if (!el) return null
+        const box = el.parentElement.getBoundingClientRect()
+        return { x: box.left + box.width / 2 - s.left, y: box.top + box.height / 2 - s.top }
+      })
+    }
+    const invalidate = () => {
+      centres = null
+    }
 
     const tick = () => {
+      if (!centres) measure()
+      const s = section.getBoundingClientRect()
       let moving = false
-      letters.forEach((el) => {
-        if (!el) return
-        const box = el.parentElement.getBoundingClientRect()
-        const dx = pointer.x - (box.left + box.width / 2)
-        const dy = pointer.y - (box.top + box.height / 2)
+      letters.forEach((el, i) => {
+        const c = centres[i]
+        if (!el || !c) return
+        const dx = pointer.x - (s.left + c.x)
+        const dy = pointer.y - (s.top + c.y)
         const influence = pointer.active ? Math.max(0, 1 - Math.hypot(dx, dy) / RADIUS) : 0
         const eased = influence * influence
         const target = { y: -eased * 38, r: (-dx / RADIUS) * influence * 7, s: 1 + eased * 0.07 }
@@ -72,10 +91,14 @@ function usePointerWave(sectionRef, lettersRef) {
         cur.y += (target.y - cur.y) * 0.14
         cur.r += (target.r - cur.r) * 0.14
         cur.s += (target.s - cur.s) * 0.14
-        if (Math.abs(cur.y - target.y) > 0.05 || Math.abs(cur.r - target.r) > 0.02) moving = true
-        el.style.transform = `translate3d(0, ${cur.y.toFixed(2)}px, 0) rotate(${cur.r.toFixed(2)}deg) scale(${cur.s.toFixed(3)})`
+        const settled = Math.abs(cur.y - target.y) < 0.05 && Math.abs(cur.r - target.r) < 0.02 && Math.abs(cur.s - target.s) < 0.001
+        if (!settled) moving = true
+        const atRest = settled && target.y === 0 && target.r === 0
+        // At rest, drop the transform entirely so the letter stops being its own GPU layer.
+        el.style.transform = atRest ? '' : `translate3d(0, ${cur.y.toFixed(2)}px, 0) rotate(${cur.r.toFixed(2)}deg) scale(${cur.s.toFixed(3)})`
       })
-      if (moving || pointer.active) frame = requestAnimationFrame(tick)
+      // Keep going only while letters are still easing; a resting pointer costs nothing.
+      if (moving) frame = requestAnimationFrame(tick)
       else running = false
     }
     const start = () => {
@@ -96,10 +119,14 @@ function usePointerWave(sectionRef, lettersRef) {
       start()
     }
 
+    window.addEventListener('scroll', invalidate, { passive: true })
+    window.addEventListener('resize', invalidate)
     section.addEventListener('pointermove', onMove, { passive: true })
     section.addEventListener('pointerleave', onLeave)
     return () => {
       cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', invalidate)
+      window.removeEventListener('resize', invalidate)
       section.removeEventListener('pointermove', onMove)
       section.removeEventListener('pointerleave', onLeave)
     }
@@ -112,6 +139,16 @@ export default function Hero() {
   const ref = useRef(null)
   const lettersRef = useRef([])
   usePointerWave(ref, lettersRef)
+  // Pause the badge spin and status ping once the hero is off screen.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return undefined
+    const io = new IntersectionObserver(([entry]) => {
+      el.toggleAttribute('data-offscreen', !entry.isIntersecting)
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   const { scrollYProgress, scrollY } = useScroll({ target: ref, offset: ['start start', 'end start'] })
   const nameY = useTransform(scrollYProgress, [0, 1], ['0%', '10%'])
@@ -190,7 +227,7 @@ export default function Hero() {
                           ref={(el) => {
                             lettersRef.current[word.start + i] = el
                           }}
-                          className="inline-block will-change-transform"
+                          className="inline-block"
                         >
                           {char}
                         </span>
