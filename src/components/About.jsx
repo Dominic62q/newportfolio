@@ -40,8 +40,8 @@ export default function About() {
             access control, data privacy, and reliability.
           </p>
           <p>
-            Recent work includes hospital inventory and ordering workflows, AssetTrack Pro, open-source mapping
-            tooling, and MarianSave, an offline-first desktop finance tracker.
+            Recent work includes hospital inventory and ordering workflows, SafeRx Hub for safe medicine disposal,
+            Hawkeye, a self-hosted error tracker, and AssetTrack Pro.
           </p>
         </Reveal>
 

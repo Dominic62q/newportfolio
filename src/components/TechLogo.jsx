@@ -14,8 +14,8 @@ export function TechLogo({ name, variant = 'chip' }) {
     return (
       <motion.li
         variants={{
-          hidden: { opacity: 0, x: -16 },
-          show: { opacity: 1, x: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+          hidden: { opacity: 0, transform: 'translateX(-16px)' },
+          show: { opacity: 1, transform: 'translateX(0px)', transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
         }}
         style={{ '--c': tech?.color }}
         className="group/t flex items-center gap-3.5 border-b border-rule py-3 text-[15px] transition-[padding] duration-300 hover:pl-2"

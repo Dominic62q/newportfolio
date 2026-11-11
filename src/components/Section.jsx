@@ -13,8 +13,8 @@ export default function Section({ id, index, label, aside, title, children, clas
           <motion.span
             aria-hidden="true"
             className="absolute inset-x-0 bottom-0 h-px origin-left bg-rule"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
+            initial={{ transform: 'scaleX(0)' }}
+            whileInView={{ transform: 'scaleX(1)' }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 1.4, ease: EASE_OUT }}
           />
